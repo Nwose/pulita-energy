@@ -1,0 +1,18 @@
+[
+    {
+        "id": "1",
+        "name": "25kVA CNG Generator, 2x500 SCUM Skids & PRMS — Telecom Tower",
+        "summary": "25kVA Compressed Natural Gas (CNG) generator backed by two 500 SCUM gas skids and a high-efficiency Pressure Reducing & Metering Station (PRMS).",
+        "date": "5 Jan 2025",
+        "images": [
+            "project1a.png",
+            "project1a.png"
+        ],
+        "details": "In a rural telecom site where diesel generators had become unreliable and costly, Pulita Nigeria stepped in to deploy a 25kVA Compressed Natural Gas (CNG) generator backed by two 500 SCUM gas skids and a high-efficiency Pressure Reducing & Metering Station (PRMS).",
+        "challenges": [
+            "The site had zero grid access and was experiencing over 50% downtime due to diesel supply inconsistencies.",
+            "Local temperature variations were affecting fuel pressure and causing voltage drops.",
+            "Space constraints meant we needed to optimize the layout of skids and the PRMS without disrupting tower infrastructure."
+        ]
+    }
+]

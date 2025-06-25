@@ -1,4 +1,4 @@
-import Images from "./assets/images.png";
+import Images from "./assets/Images.png";
 
 const AboutWhoWeAre = () => {
   return (

@@ -48,29 +48,28 @@ const Header = () => {
           {/* Contact Button */}
           <div className="hidden md:flex">
             <Link to="/contact">
-              {/* <button className="relative overflow-hidden group bg-black text-white px-10 py-2 rounded-full flex items-center">
-                <p className=" relative z-10 group-hover:text-white transition-colors duration-300 md:pr-5">
-                  Contact Us
-                </p>
-                <span
-                  className="absolute right-0 top-0 h-full w-12 bg-[#2563EB] transition-all duration-300 ease-in-out group-hover:w-full z-0 rounded-full flex items-center justify-center"
-                  style={{ minWidth: "3rem" }}
-                >
-                  <FaArrowRight size={15} className="text-white " />
-                </span>
-
-              </button> */}
-              <button className="relative overflow-hidden group bg-black text-white px-10 py-2 rounded-full flex items-center justify-center">
-                {/* Text on top of animated background */}
+              {/* <button className="relative overflow-hidden group bg-black text-white px-10 py-2 rounded-full flex items-center justify-center">
+              
                 <p className="relative z-10 group-hover:text-white transition-colors duration-300 md:pr-5">
                   Contact Us
                 </p>
 
-                {/* Expanding background behind content */}
+              
                 <span className="absolute left-0 top-0 h-full w-0 bg-[#2563EB] transition-all duration-300 ease-in-out group-hover:w-full z-0 rounded-full" />
 
-                {/* Fixed-position arrow on the right */}
+               
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 z-10">
+                  <FaArrowRight size={15} className="text-white" />
+                </span>
+              </button> */}
+              <button className="btn relative overflow-hidden group bg-black text-white px-6 py-2 rounded-full flex items-center">
+                <p className="font-bold relative z-10 group-hover:text-white transition-colors duration-300">
+                  Contact Us
+                </p>
+                <span
+                  className="btn-circle absolute right-0 top-0 h-full w-12 bg-[#2563EB] transition-all duration-300 ease-in-out group-hover:w-full z-0 rounded-full items-center justify-center"
+                  style={{ minWidth: "3rem" }}
+                >
                   <FaArrowRight size={15} className="text-white" />
                 </span>
               </button>

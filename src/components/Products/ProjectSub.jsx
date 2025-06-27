@@ -24,7 +24,7 @@ import {
 } from "../Products/assests/index";
 import Electric from "../Products/assests/VectorVertical.svg";
 
-// 🔹 Card Component
+//  Card Component
 const Card = ({ title, text, image, icons }) => {
   return (
     <motion.div

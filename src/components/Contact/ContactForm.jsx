@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { HiChevronDown } from "react-icons/hi";
+import emailjs from "emailjs-com";
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -9,8 +10,9 @@ const ContactForm = () => {
     productType: "",
     message: "",
   });
-
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const productTypes = [
     "Solar Panels",
@@ -39,8 +41,34 @@ const ContactForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Handle form submission logic here
+    setSuccess("");
+    setError("");
+
+    // Replace with your EmailJS service, template, and user IDs I used mine Luizo, you can change it by creating an account on emailjs.com
+    emailjs
+      .send(
+        "service_n52a19z",
+        "template_md5c3pf",
+        formData,
+        "bQE5kBBTyQzSNZDPp"
+      )
+      .then(
+        (result) => {
+          setSuccess(
+            "Thank you for contacting us! We have received your message and will respond soon."
+          );
+          setFormData({
+            name: "",
+            phone: "",
+            email: "",
+            productType: "",
+            message: "",
+          });
+        },
+        (error) => {
+          setError("Sorry, something went wrong. Please try again later.");
+        }
+      );
   };
 
   return (
@@ -56,6 +84,18 @@ const ContactForm = () => {
             here to help. Reach out to start building your energy future.
           </p>
         </div>
+
+        {/* Success/Error Message */}
+        {success && (
+          <div className="mb-6 text-green-600 font-semibold text-center">
+            {success}
+          </div>
+        )}
+        {error && (
+          <div className="mb-6 text-red-600 font-semibold text-center">
+            {error}
+          </div>
+        )}
 
         <form
           onSubmit={handleSubmit}
@@ -186,7 +226,7 @@ const ContactForm = () => {
           <div className="text-center">
             <button
               type="submit"
-              className="bg-gray-900 text-white px-8 py-4 rounded-full font-medium hover:bg-gray-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="bg-gray-900 text-white px-8 py-4 rounded-full font-medium hover:bg-blue-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               Start Your Project with Us
             </button>

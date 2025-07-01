@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "name": "25kVA CNG Generator, 2x500 SCUM Skids & PRMS – Telecom Tower",
+        "details": "25kVA Compressed Natural Gas (CNG) generator backed by two 500 SCUM gas skids and a high-efficiency Pressure Reducing & Metering Station (PRMS).",
+        "image": "project1.png"
+    },
+    {
+        "id": 2,
+        "name": "MRU & CNG Conversion Center – Portland, Ojota, Lagos",
+        "details": "A Mobile Refueling Unit (MRU) and CNG Vehicle Conversion Center in Portland Yard, Ojota",
+        "image": "project2.png"
+    },
+    {
+        "id": 3,
+        "name": "Dual 100kVA LPG Generator Commissioning – Citec, Abuja",
+        "details": "Centralized Power + Cooking Gas via Underground Tank",
+        "image": "project3.png"
+    },
+    {
+        "id": 4,
+        "name": "60kVA LPG Generator with Underground Tank – Residential Installation",
+        "details": "A 60kVA LPG generator with a subsurface LPG storage tank.",
+        "image": "project4.png"
+    }
+]

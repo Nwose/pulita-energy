@@ -13,6 +13,20 @@
             "The site had zero grid access and was experiencing over 50% downtime due to diesel supply inconsistencies.",
             "Local temperature variations were affecting fuel pressure and causing voltage drops.",
             "Space constraints meant we needed to optimize the layout of skids and the PRMS without disrupting tower infrastructure."
+        ],
+        " Solutions Provided": [
+            "Installed rugged, temperature-tolerant PRMS with pressure relief and regulator valves optimized for the tower’s power draw.",
+            "Replaced diesel gensets with a CNG generator capable of unattended auto-start operation, reducing human interference.",
+            "Designed the setup for extended runtime, allowing up to 10 days of power without refueling."
+        ],
+        "Project Impact": [
+            "Improved tower uptime to 99.5%, ensuring consistent telecom signals.",
+            "Fuel cost savings of up to 40% monthly.",
+            "Reduced servicing frequency by half thanks to CNG’s cleaner combustion."
+        ],
+        " After-Sales Service": [
+            "Pulita provided a fuel supply contract, regular PRMS checks, and remote monitoring tools. We also trained the telecom field team on generator handling and minor pressure diagnostics.",
+            "This deployment proves CNG can reliably power off-grid telecom towers, cutting diesel dependence and reducing carbon footprint."
         ]
     }
 ]

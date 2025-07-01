@@ -4,12 +4,12 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 
 import Home from "./pages/Home";
-
 import Products from "./pages/Products";
 import Projects from "./pages/Projects";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import ProjectDetails from "./pages/ProjectDetails";
+import ExtraProjectDetails from "./pages/ExtraProjectDetails";
 
 function App() {
   return (
@@ -22,6 +22,10 @@ function App() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/projects/:id" element={<ProjectDetails />} />
+        <Route
+          path="/extra-project-details"
+          element={<ExtraProjectDetails />}
+        />
       </Routes>
       <Footer />
     </BrowserRouter>

@@ -11,7 +11,7 @@ const AboutHeroSection = ({ src, isVisible }) => (
 
     {/* Animated Info Card - halfway below the image */}
     <div
-      className={`absolute -bottom-24 left-5 right-5 lg:left-12 lg:right-auto lg:max-w-2xl transform transition-all duration-1000 ease-out z-10 ${
+      className={`absolute -bottom-24 md:-bottom-52 left-5 right-5 lg:left-12 lg:right-auto lg:max-w-2xl transform transition-all duration-1000 ease-out z-10 ${
         isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
       }`}
     >

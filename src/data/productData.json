@@ -1,0 +1,121 @@
+[
+    {
+        "title": "LPG Generator Sets",
+        "text": "Save money, reduce emissions, and ensure peace of mind.",
+        "image": "lpg",
+        "icons": [
+            "FaGasPump",
+            "FaPlug",
+            "FaLeaf"
+        ],
+        "details": "Efficient LPG generators for residential and commercial use.",
+        "pdfs": [
+            {
+                "name": "LPG Generator Sets Spec",
+                "file": "lpg-generator-sets.pdf"
+            }
+        ]
+    },
+    {
+        "title": "CNG Generator Sets",
+        "text": "No more fuel stress or blackouts—just sustainable power.",
+        "image": "cng",
+        "icons": [
+            "FaBolt",
+            "FaLeaf",
+            "FaHome"
+        ],
+        "details": "Reliable CNG generators for continuous clean energy.",
+        "pdfs": [
+            {
+                "name": "CNG Generator Sets Spec",
+                "file": "cng-generator-sets.pdf"
+            }
+        ]
+    },
+    {
+        "title": "CNG Cylinder",
+        "text": "Enjoy clean energy without the noise or high cost.",
+        "image": "cylinder",
+        "icons": [
+            "FaCog",
+            "FaBus",
+            "FaGlobe"
+        ],
+        "details": "High-pressure CNG cylinders for safe fuel storage.",
+        "pdfs": [
+            {
+                "name": "CNG Cylinder Spec",
+                "file": "cng-cylinder.pdf"
+            }
+        ]
+    },
+    {
+        "title": "PRMS",
+        "text": "Advanced pressure reduction and metering solutions.",
+        "image": "prms",
+        "icons": [
+            "FaFlask",
+            "FaTachometerAlt",
+            "FaLock"
+        ],
+        "details": "Precision PRMS for industrial and commercial applications.",
+        "pdfs": [
+            {
+                "name": "PRMS Spec",
+                "file": "prms.pdf"
+            }
+        ]
+    },
+    {
+        "title": "Mobile Daughter Gas Station",
+        "text": "The daughter gas refill station consists of gas cylinder group...",
+        "image": "kits",
+        "icons": [
+            "FaFlask",
+            "FaTachometerAlt",
+            "FaLock"
+        ],
+        "details": "Mobile solutions for flexible gas distribution.",
+        "pdfs": [
+            {
+                "name": "Mobile Daughter Gas Station Spec",
+                "file": "mobile-daughter-gas-station.pdf"
+            }
+        ]
+    },
+    {
+        "title": "Gas Station",
+        "text": "We provide one-stop gas station EPC solutions customizable high-standard design...",
+        "image": "Dual",
+        "icons": [
+            "FaFlask",
+            "FaTachometerAlt",
+            "FaLock"
+        ],
+        "details": "Complete EPC solutions for modern gas stations.",
+        "pdfs": [
+            {
+                "name": "Gas Station Spec",
+                "file": "gas-station.pdf"
+            }
+        ]
+    },
+    {
+        "title": "CNG Vehicles Conversion Kits",
+        "text": "CNG cylinders are installed under chassisat vehicle to store fuel, High-pressure..",
+        "image": "skids",
+        "icons": [
+            "FaFlask",
+            "FaTachometerAlt",
+            "FaLock"
+        ],
+        "details": "Conversion kits for safe and efficient CNG vehicle operation.",
+        "pdfs": [
+            {
+                "name": "Conversion Kits Spec",
+                "file": "conversion-kits.pdf"
+            }
+        ]
+    }
+]

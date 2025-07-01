@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AboutHeader from "../components/about/AboutHeader";
 import AboutHeroSection from "../components/about/AboutHeroSection";
-import AboutHero from "../assets/AboutHero.png";
+import AboutHero from "../assets/AboutHero.jpg"; // Ensure this path is correct
 import AboutWhoWeAre from "../components/about/AboutWhoWeAre";
 import TeamSection from "../components/about/TeamSection";
 import AboutScrollRevealCard from "../components/about/AboutScrollReveal";
@@ -16,7 +16,7 @@ const About = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-20 px-4 lg:px-8 font-satoshi">
+    <section className="relative min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-20 px-4 lg:px-8 font-satoshi ">
       <div className="max-w-7xl mx-auto">
         <AboutHeader />
         <AboutHeroSection src={AboutHero} isVisible={isVisible} />

@@ -2,7 +2,7 @@ import Images from "./assets/Images.png";
 
 const AboutWhoWeAre = () => {
   return (
-    <div className="bg-gray-50 py-16 px-4">
+    <div className="bg-gray-50 py-16 px-4 md:mt-72">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">

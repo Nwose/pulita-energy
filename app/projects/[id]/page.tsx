@@ -15,9 +15,7 @@ interface Project {
   [key: string]: any;
 }
 
-interface ProjectDetailsPageProps {
-  params: { id: string };
-}
+type ProjectDetailsPageProps = { params: Promise<{ id: string }> };
 
 const sectionTitles: Record<string, string> = {
   "Solutions Provided": "Solutions Provided",
@@ -33,8 +31,10 @@ function getProjectById(id: string): {
   return { project: (projects as Project[])[index], index };
 }
 
-const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({ params }) => {
-  const { id } = params;
+export default async function ProjectDetailsPage({
+  params,
+}: ProjectDetailsPageProps) {
+  const { id } = await params;
   const { project, index: projectIndex } = getProjectById(id);
 
   if (!project) {
@@ -152,6 +152,4 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({ params }) => {
       </div>
     </div>
   );
-};
-
-export default ProjectDetailsPage;
+}

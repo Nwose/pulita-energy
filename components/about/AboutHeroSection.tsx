@@ -2,7 +2,7 @@ import React from "react";
 import { FiArrowRight } from "react-icons/fi";
 import Image from "next/image";
 
-interface AboutHeroSectionProps {
+export interface AboutHeroSectionProps {
   src?: string;
   isVisible: boolean;
 }
@@ -17,7 +17,8 @@ const AboutHeroSection: React.FC<AboutHeroSectionProps> = ({
       alt="PULITA NEW ENERGY team"
       width={1200}
       height={600}
-      className="w-full h-[500px] sm:h-[600px] object-cover rounded-3xl"
+      className="w-full h-[500px] sm:h-[600px] object-cover rounded-3xl transition-all duration-700"
+      priority
     />
     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-3xl" />
     {/* Animated Info Card - halfway below the image */}

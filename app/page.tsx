@@ -1,12 +1,26 @@
-import HeroSection from "../components/HeroSection";
-import StatsSection from "../components/StatsSection";
-import AboutPulita from "../components/AboutPulita";
-import ProductCard from "../components/ProductCard";
-import ScrollRevealCard from "../components/ScrollRevealCard";
-import RecentProject from "../components/RecentProject";
-import PulitaEnergySection from "../components/PulitaEnergySection";
-import ContactSection from "../components/ContactSection";
 import React from "react";
+import dynamic from "next/dynamic";
+import AboutPulita from "../components/AboutPulita";
+import ContactSection from "../components/ContactSection";
+
+const HeroSection = dynamic(() => import("../components/HeroSection"), {
+  ssr: false,
+});
+const StatsSection = dynamic(() => import("../components/StatsSection"), {
+  ssr: false,
+});
+const ProductCard = dynamic(() => import("../components/ProductCard"), {
+  ssr: false,
+});
+const ScrollRevealCard = dynamic(() => import("../components/ScrollRevealCard"), {
+  ssr: false,
+});
+const RecentProject = dynamic(() => import("../components/RecentProject"), {
+  ssr: false,
+});
+const PulitaEnergySection = dynamic(() => import("../components/PulitaEnergySection"), {
+  ssr: false,
+});
 
 const HomePage: React.FC = () => (
   <>

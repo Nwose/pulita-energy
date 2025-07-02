@@ -41,8 +41,9 @@ const cardVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      delay: i * 0.1,
-      duration: 0.5,
+      delay: i * 0.15,
+      duration: 0.6,
+      ease: "easeOut" as const,
     },
   }),
 };
@@ -79,6 +80,7 @@ const AboutScrollRevealCard: React.FC = () => {
                 viewport={{ once: true, amount: 0.4 }}
                 variants={cardVariants}
                 custom={index}
+                aria-label={feature.title}
               >
                 <div className="mb-6">
                   <div className="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-4">

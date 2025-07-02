@@ -1,38 +1,59 @@
 import { FiMail } from "react-icons/fi";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import React from "react";
-import { TeamMember } from "./TeamSection";
 
-interface TeamCardProps {
+export interface TeamMember {
+  name: string;
+  role: string;
+  image: string | StaticImageData;
+  email?: string;
+  bio?: string;
+}
+
+export interface TeamCardProps {
   member: TeamMember;
 }
 
 const TeamCard: React.FC<TeamCardProps> = ({ member }) => {
+  // Default width/height if not available
+  const width =
+    typeof member.image === "object" && "width" in member.image
+      ? member.image.width
+      : 300;
+  const height =
+    typeof member.image === "object" && "height" in member.image
+      ? member.image.height
+      : 300;
+
   return (
     <div className="slide-up relative w-full h-[500px] rounded-2xl overflow-hidden shadow-lg group">
       {/* Background Image */}
       <Image
         src={member.image}
         alt={member.name}
-        fill
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+        width={width}
+        height={height}
         draggable={false}
       />
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/30 z-10" />
-      {/* Hover Card (slides up to replace Z-shape label) */}
-      <div className="slide-up-object absolute bottom-20 left-0 w-full z-30 transform translate-y-full transition-transform duration-500 ease-in-out text-gray-800 pt-0 pb-5 rounded-t-2xl backdrop-blur-sm">
-        <h3 className="text-lg font-bold position-relative">{member.name}</h3>
-        <div className="slide-inner p-3">
-          <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-            {member.role}
-          </p>
-          <p className="text-sm text-gray-600 mt-3 mb-4">{member.bio}</p>
-          <div className="flex items-center text-sm text-gray-600 hover:text-gray-800 transition-colors">
-            <FiMail className="w-4 h-4 mr-2" />
-            <span>{member.email}</span>
-          </div>
-        </div>
+      {/* Info Card */}
+      <div className="relative z-20 flex flex-col justify-end h-full p-6">
+        <h3 className="text-2xl font-bold text-white mb-1">{member.name}</h3>
+        <p className="text-blue-200 text-lg font-medium mb-2">{member.role}</p>
+        {member.bio && (
+          <p className="text-sm text-blue-100 mb-2">{member.bio}</p>
+        )}
+        {member.email && (
+          <a
+            href={`mailto:${member.email}`}
+            className="inline-flex items-center text-blue-400 hover:text-blue-200"
+          >
+            <FiMail className="mr-2" />
+            {member.email}
+          </a>
+        )}
       </div>
     </div>
   );

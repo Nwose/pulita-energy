@@ -19,22 +19,27 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
       <button
         className="w-full flex justify-between items-center px-6 py-6 text-left text-lg font-medium text-gray-700 focus:outline-none transition-colors duration-300 hover:bg-gray-50"
         onClick={onClick}
+        aria-expanded={isOpen}
+        aria-controls={`accordion-content-${title}`}
+        type="button"
       >
         <span>{title}</span>
         <span className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:border-gray-400 transition">
           {isOpen ? (
-            <FaMinus className="text-gray-500" />
+            <FaMinus className="text-blue-600" />
           ) : (
-            <FaPlus className="text-gray-500" />
+            <FaPlus className="text-blue-600" />
           )}
         </span>
       </button>
       <div
+        id={`accordion-content-${title}`}
         className={`overflow-hidden transition-all duration-500 ease-in-out ${
           isOpen
             ? "max-h-96 opacity-100 px-6 pb-6"
             : "max-h-0 opacity-0 px-6 pb-0"
         } text-gray-600 leading-relaxed`}
+        aria-hidden={!isOpen}
       >
         <p>{content}</p>
       </div>
@@ -46,8 +51,7 @@ const PulitaEnergySection: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleAccordion = (index: number) => {
-    const isClosing = openIndex === index;
-    setOpenIndex(isClosing ? null : index);
+    setOpenIndex(openIndex === index ? null : index);
   };
 
   const items = [

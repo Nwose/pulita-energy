@@ -1,10 +1,11 @@
 import React from "react";
+import Image from "next/image";
 
 export interface StatsCardProps {
   icon: React.ComponentType<
     React.SVGProps<SVGSVGElement> & { className?: string }
   >;
-  number: string;
+  number: string | number;
   title: string;
   description: string;
 }
@@ -18,10 +19,13 @@ const StatsCard: React.FC<StatsCardProps> = ({
   return (
     <div className="relative group bg-[#efeded] rounded-xl p-4 shadow-lg border border-gray-100 font-satoshi mb-6 mx-2 overflow-hidden ">
       {/* Background SVG (initially hidden off-screen left) */}
-      <img
+      <Image
         src="/Effect.svg"
         alt="Effect background"
         className="absolute top-0 left-[-100%] w-full h-full object-cover  transition-all duration-700 ease-in-out group-hover:left-0 z-0"
+        width={200}
+        height={200}
+        priority={false}
       />
 
       {/* Foreground Content (above background SVG) */}

@@ -92,7 +92,7 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({ params }) => {
           {(project.images ?? []).map((img: string, index: number) => (
             <Image
               key={index}
-              src={`/assets/${img}`}
+              src={img.startsWith("/assets/") ? img : `/assets/${img}`}
               alt={`Project image ${index + 1}`}
               width={600}
               height={320}

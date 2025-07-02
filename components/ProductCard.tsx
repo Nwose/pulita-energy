@@ -16,13 +16,13 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import React from "react";
 
-// 🔹 Card Component
-type CardProps = {
+// Card Props
+interface CardProps {
   title: string;
   text: string;
-  image: string;
+  image: string; // path relative to /public/assets
   icons: React.ComponentType<{ size?: number }>[];
-};
+}
 
 const Card: React.FC<CardProps> = ({ title, text, image, icons }) => {
   return (
@@ -82,7 +82,7 @@ const Card: React.FC<CardProps> = ({ title, text, image, icons }) => {
   );
 };
 
-//  CardGrid Component
+// CardGrid
 const CardGrid: React.FC = () => {
   const cards = [
     {
@@ -126,7 +126,7 @@ const CardGrid: React.FC = () => {
   );
 };
 
-//  ProductShowcase Component
+// ProductShowcase
 const ProductShowcase: React.FC = () => {
   return (
     <section className="bg-gray-50 px-6 py-16 font-satoshi">
@@ -148,7 +148,6 @@ const ProductShowcase: React.FC = () => {
 
         {/* Centered Button */}
         <button className="btn relative overflow-hidden group bg-black text-white px-6 py-2 rounded-full flex items-center mx-auto my-10">
-          {/* Animated Blue Overlay */}
           <p className="font-bold relative z-10 group-hover:text-white transition-colors duration-300">
             See All Services
           </p>

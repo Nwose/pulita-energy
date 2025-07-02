@@ -14,7 +14,7 @@ import EnergyIcons from "./EnergyIcons";
 
 const PowerUp: React.FC = () => {
   return (
-    <div className=" min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden">
       <CircuitLines />
       <EnergyIcons />
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-16 ">

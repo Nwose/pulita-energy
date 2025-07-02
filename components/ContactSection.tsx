@@ -26,8 +26,11 @@ const ContactSection: React.FC = () => {
     productType: "",
   });
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -65,10 +68,9 @@ const ContactSection: React.FC = () => {
               </label>
               <input
                 type="text"
+                name="name"
                 value={formData.name}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleInputChange("name", e.target.value)
-                }
+                onChange={handleInputChange}
                 className="w-full bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Jane Smith"
               />
@@ -80,10 +82,9 @@ const ContactSection: React.FC = () => {
               </label>
               <input
                 type="tel"
+                name="phone"
                 value={formData.phone}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleInputChange("phone", e.target.value)
-                }
+                onChange={handleInputChange}
                 className="w-full bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="09038475866"
               />
@@ -95,10 +96,9 @@ const ContactSection: React.FC = () => {
               </label>
               <input
                 type="email"
+                name="email"
                 value={formData.email}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleInputChange("email", e.target.value)
-                }
+                onChange={handleInputChange}
                 className="w-full bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="jane@example.com"
               />
@@ -109,10 +109,9 @@ const ContactSection: React.FC = () => {
                 Product Type
               </label>
               <select
+                name="productType"
                 value={formData.productType}
-                onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                  handleInputChange("productType", e.target.value)
-                }
+                onChange={handleInputChange}
                 className="w-full bg-gray-700/50 border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Select...</option>

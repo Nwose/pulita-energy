@@ -28,8 +28,8 @@ const StatsSection: React.FC = () => {
   ];
 
   return (
-    <section className=" px-4 font-satoshi">
-      <div className=" mx-auto">
+    <section className="px-4 font-satoshi">
+      <div className="mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
           {stats.map((stat, index) => (
             <StatsCard

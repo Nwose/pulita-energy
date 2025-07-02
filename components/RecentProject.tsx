@@ -2,7 +2,13 @@ import { FaArrowRight } from "react-icons/fa";
 import Image from "next/image";
 import React from "react";
 
-const projects = [
+interface Project {
+  id: number;
+  title: string;
+  imageUrl: string;
+}
+
+const projects: Project[] = [
   {
     id: 1,
     title: "25kVA CNG Generator, 2x500 SCUM Skids & PRMS",
@@ -57,10 +63,7 @@ const RecentProjects: React.FC = () => {
           ))}
         </div>
 
-        {/* Centered Button */}
-
         <button className="btn relative overflow-hidden group bg-black text-white px-6 py-2 rounded-full flex items-center mx-auto my-10">
-          {/* Animated Blue Overlay */}
           <p className="font-bold relative z-10 group-hover:text-white transition-colors duration-300">
             See Projects
           </p>

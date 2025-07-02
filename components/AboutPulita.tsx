@@ -1,6 +1,7 @@
+"use client";
+import React from "react";
 import { FaArrowRight } from "react-icons/fa6";
 import { motion } from "framer-motion";
-import React from "react";
 
 const fadeLeft = {
   hidden: { opacity: 0, x: -60 },

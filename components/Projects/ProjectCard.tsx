@@ -1,24 +1,39 @@
 import { FiMail } from "react-icons/fi";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import React from "react";
 
 export interface ProjectMember {
   name: string;
   role: string;
-  bio: string;
-  email: string;
-  image: string;
+  image: string | StaticImageData;
+  bio?: string;
+  email?: string;
 }
 
-const ProjectCard: React.FC<{ member: ProjectMember }> = ({ member }) => {
+export interface ProjectCardProps {
+  member: ProjectMember;
+}
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ member }) => {
+  // Default width/height if not available
+  const width =
+    typeof member.image === "object" && "width" in member.image
+      ? member.image.width
+      : 400;
+  const height =
+    typeof member.image === "object" && "height" in member.image
+      ? member.image.height
+      : 400;
+
   return (
     <div className="drop-vec relative w-full h-[400px] rounded-2xl overflow-hidden shadow-lg group">
       {/* Background Image */}
       <Image
         src={member.image}
         alt={member.name}
-        fill
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+        width={width}
+        height={height}
         draggable={false}
       />
       {/* Dark Overlay */}
@@ -30,13 +45,17 @@ const ProjectCard: React.FC<{ member: ProjectMember }> = ({ member }) => {
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
             {member.role}
           </p>
-          <p className="text-sm text-gray-600 mt-2 mb-3 line-clamp-2">
-            {member.bio}
-          </p>
-          <div className="flex items-center text-sm text-gray-600 hover:text-gray-800 transition-colors">
-            <FiMail className="w-4 h-4 mr-2" />
-            <span>{member.email}</span>
-          </div>
+          {member.bio && (
+            <p className="text-sm text-gray-600 mt-2 mb-3 line-clamp-2">
+              {member.bio}
+            </p>
+          )}
+          {member.email && (
+            <div className="flex items-center text-sm text-gray-600 hover:text-gray-800 transition-colors">
+              <FiMail className="w-4 h-4 mr-2" />
+              <span>{member.email}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

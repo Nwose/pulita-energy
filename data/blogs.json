@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "title": "Team at Office",
+    "slug": "team-at-office",
+    "excerpt": "At Alles Charis, we recognize that challenges are part of every work environment—tight deadlines, shifting priorities, and unexpected obstacles can...",
+    "content": "At Alles Charis, we recognize that challenges are part of every work environment—tight deadlines, shifting priorities, and unexpected obstacles can test even the best professionals. The difference between burnout and breakthrough is resilience - the ability to adapt, recover, and keep moving forward.\nResilient teams stay focused under pressure, find solutions in difficult situations, and maintain productivity despite setbacks. They don't just navigate challenges; they grow through them. By promoting resilience, we create a workplace where innovation, collaboration, and sustained success thrive.",
+    "image": "/blog/team-office.jpg",
+    "author": "Super Admin",
+    "authorAvatar": "/blog/super-admin.png",
+    "date": "2025-04-30"
+  },
+  {
+    "id": 2,
+    "title": "Alles Charis HSE Day",
+    "slug": "alles-charis-hse-day",
+    "excerpt": "On the 30th April 2025, the Alles Charis team came together for our HSE Day — a full-day experience dedicated to health, safety, and...",
+    "content": "On the 30th April 2025, the Alles Charis team came together for our HSE Day — a full-day experience dedicated to health, safety, and environmental awareness.\nThe event featured expert speakers, hands-on workshops, and team-building activities, all designed to reinforce our commitment to a safe and healthy workplace.",
+    "image": "/blog/hse-day.jpg",
+    "author": "Super Admin",
+    "authorAvatar": "/blog/super-admin.png",
+    "date": "2025-04-30"
+  },
+  {
+    "id": 3,
+    "title": "SEO Optimization for React with Vite Apps",
+    "slug": "seo-optimization-react-vite",
+    "excerpt": "SEO (Search Engine Optimization) plays a pivotal role in improving the discoverability of your web application. However, React applications often fa...",
+    "content": "SEO (Search Engine Optimization) plays a pivotal role in improving the discoverability of your web application. However, React applications often face unique challenges when it comes to SEO. In this article, we explore best practices for optimizing React apps built with Vite.",
+    "image": "/blog/seo-vite.jpg",
+    "author": "ernie admin",
+    "authorAvatar": "/blog/ernie-admin.png",
+    "date": "2025-04-29"
+  }
+]

@@ -1,4 +1,6 @@
-# React + Vite
+# Pulita Energy
+
+> **Note:** This project is being migrated from React 18 (Vite) to Next.js 15. See the `dev` branch for migration progress.
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

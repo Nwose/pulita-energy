@@ -1,0 +1,114 @@
+[
+    {
+        "id": "1",
+        "name": "25kVA CNG Generator, 2x500 SCUM Skids & PRMS — Telecom Tower",
+        "summary": "25kVA Compressed Natural Gas (CNG) generator backed by two 500 SCUM gas skids and a high-efficiency Pressure Reducing & Metering Station (PRMS).",
+        "date": "5 Jan 2025",
+        "images": [
+            "project1a.png",
+            "project1a.png"
+        ],
+        "details": "In a rural telecom site where diesel generators had become unreliable and costly, Pulita Nigeria stepped in to deploy a 25kVA Compressed Natural Gas (CNG) generator backed by two 500 SCUM gas skids and a high-efficiency Pressure Reducing & Metering Station (PRMS).",
+        "challenges": [
+            "The site had zero grid access and was experiencing over 50% downtime due to diesel supply inconsistencies.",
+            "Local temperature variations were affecting fuel pressure and causing voltage drops.",
+            "Space constraints meant we needed to optimize the layout of skids and the PRMS without disrupting tower infrastructure."
+        ],
+        " Solutions Provided": [
+            "Installed rugged, temperature-tolerant PRMS with pressure relief and regulator valves optimized for the tower’s power draw.",
+            "Replaced diesel gensets with a CNG generator capable of unattended auto-start operation, reducing human interference.",
+            "Designed the setup for extended runtime, allowing up to 10 days of power without refueling."
+        ],
+        "Project Impact": [
+            "Improved tower uptime to 99.5%, ensuring consistent telecom signals.",
+            "Fuel cost savings of up to 40% monthly.",
+            "Reduced servicing frequency by half thanks to CNG’s cleaner combustion."
+        ],
+        " After-Sales Service": [
+            "Pulita provided a fuel supply contract, regular PRMS checks, and remote monitoring tools. We also trained the telecom field team on generator handling and minor pressure diagnostics.",
+            "This deployment proves CNG can reliably power off-grid telecom towers, cutting diesel dependence and reducing carbon footprint."
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Copy of Solar Mini-Grid Installation",
+        "summary": "Installed a 50kW system in another location.",
+        "date": "April 2024",
+        "images": [
+            "project1a.png",
+            "project1a.png"
+        ],
+        "details": "This is a duplicate for testing navigation.",
+        "challenges": [
+            "Rainy season",
+            "Logistics delays"
+        ],
+        "Solutions Provided": [
+            "New hybrid inverter",
+            "Training program"
+        ],
+        "Project Impact": [
+            "Improved power access",
+            "Job creation"
+        ],
+        "After-Sales Service": [
+            "Annual check-ins"
+        ]
+    },
+    {
+        "id": "3",
+        "name": "25kVA CNG Generator, 2x500 SCUM Skids & PRMS — Telecom Tower",
+        "summary": "25kVA Compressed Natural Gas (CNG) generator backed by two 500 SCUM gas skids and a high-efficiency Pressure Reducing & Metering Station (PRMS).",
+        "date": "5 Jan 2025",
+        "images": [
+            "project1a.png",
+            "project1a.png"
+        ],
+        "details": "In a rural telecom site where diesel generators had become unreliable and costly, Pulita Nigeria stepped in to deploy a 25kVA Compressed Natural Gas (CNG) generator backed by two 500 SCUM gas skids and a high-efficiency Pressure Reducing & Metering Station (PRMS).",
+        "challenges": [
+            "The site had zero grid access and was experiencing over 50% downtime due to diesel supply inconsistencies.",
+            "Local temperature variations were affecting fuel pressure and causing voltage drops.",
+            "Space constraints meant we needed to optimize the layout of skids and the PRMS without disrupting tower infrastructure."
+        ],
+        " Solutions Provided": [
+            "Installed rugged, temperature-tolerant PRMS with pressure relief and regulator valves optimized for the tower’s power draw.",
+            "Replaced diesel gensets with a CNG generator capable of unattended auto-start operation, reducing human interference.",
+            "Designed the setup for extended runtime, allowing up to 10 days of power without refueling."
+        ],
+        "Project Impact": [
+            "Improved tower uptime to 99.5%, ensuring consistent telecom signals.",
+            "Fuel cost savings of up to 40% monthly.",
+            "Reduced servicing frequency by half thanks to CNG’s cleaner combustion."
+        ],
+        " After-Sales Service": [
+            "Pulita provided a fuel supply contract, regular PRMS checks, and remote monitoring tools. We also trained the telecom field team on generator handling and minor pressure diagnostics.",
+            "This deployment proves CNG can reliably power off-grid telecom towers, cutting diesel dependence and reducing carbon footprint."
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Copy of Solar Mini-Grid Installation",
+        "summary": "Installed a 50kW system in another location.",
+        "date": "April 2024",
+        "images": [
+            "project1a.png",
+            "project1a.png"
+        ],
+        "details": "This is a duplicate for testing navigation.",
+        "challenges": [
+            "Rainy season",
+            "Logistics delays"
+        ],
+        "Solutions Provided": [
+            "New hybrid inverter",
+            "Training program"
+        ],
+        "Project Impact": [
+            "Improved power access",
+            "Job creation"
+        ],
+        "After-Sales Service": [
+            "Annual check-ins"
+        ]
+    }
+]

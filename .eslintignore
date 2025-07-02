@@ -1,0 +1,6 @@
+app/generated/prisma/*
+src/components/*
+src/pages/*
+src/assets/*
+assets/*
+data/* 

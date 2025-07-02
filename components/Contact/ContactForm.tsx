@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { HiChevronDown } from "react-icons/hi";
 import emailjs from "emailjs-com";

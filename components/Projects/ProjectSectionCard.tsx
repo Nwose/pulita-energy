@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import projectCards from "../../data/projectCards.json";
+// import projectCards from "../../data/projectCards.json";
+import projectsData from "../../data/projects.json";
 
 interface Project {
   id: string | number;
@@ -19,18 +20,19 @@ const ProjectSectionCard: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
 
   useEffect(() => {
-    fetch("/api/projects")
-      .then((res) => res.ok ? res.json() : Promise.reject())
-      .then((data) => {
-        if (data && Array.isArray(data.projects)) {
-          setProjects(data.projects);
-        } else {
-          setProjects(projectCards as Project[]);
-        }
-      })
-      .catch(() => {
-        setProjects(projectCards as Project[]);
-      });
+    // fetch("/api/projects")
+    //   .then((res) => res.ok ? res.json() : Promise.reject())
+    //   .then((data) => {
+    //     if (data && Array.isArray(data.projects)) {
+    //       setProjects(data.projects);
+    //     } else {
+    //       setProjects(projectCards as Project[]);
+    //     }
+    //   })
+    //   .catch(() => {
+    //     setProjects(projectCards as Project[]);
+    //   });
+    setProjects(projectsData as Project[]);
   }, []);
 
   return (
@@ -44,16 +46,21 @@ const ProjectSectionCard: React.FC = () => {
         </h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-6xl mx-auto">
-        {projects.slice(0, 4).map((project) => {
+        {projects.slice(0, 4).map((project, idx) => {
           // Prefer images[0] if available, else fallback to image field
-          const imageSrc = project.images && project.images[0]
-            ? project.images[0]
-            : project.image
-            ? `/assets/${project.image}`
-            : "/assets/project1.png";
+          let imageSrc =
+            project.images && project.images[0]
+              ? project.images[0]
+              : project.image
+              ? project.image
+              : "project1.png";
+          // Ensure imageSrc is absolute
+          if (!imageSrc.startsWith("/")) {
+            imageSrc = `/assets/${imageSrc}`;
+          }
           return (
             <Link
-              key={project.id}
+              key={`${project.id}-${idx}`}
               href={`/projects/${project.id}`}
               className="drop-vec group relative overflow-hidden rounded-3xl shadow-lg"
             >

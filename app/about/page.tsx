@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import AboutHeader from "../../components/about/AboutHeader";
 import AboutHeroSection from "../../components/about/AboutHeroSection";

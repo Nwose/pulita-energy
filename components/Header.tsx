@@ -52,19 +52,12 @@ const Header: React.FC = () => {
           {/* Contact Button (Desktop) */}
           <div className="hidden md:flex">
             <Link href="/contact">
-              <button
-                className="relative overflow-hidden group bg-black text-white px-6 py-2 rounded-full flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500"
-                type="button"
-              >
-                <p className="font-bold relative z-10 group-hover:text-white transition-colors duration-300">
-                  Contact Us
-                </p>
-                <span
-                  className="btn-circle absolute right-0 top-0 h-full w-12 bg-[#2563EB] transition-all duration-300 ease-in-out group-hover:w-full z-0 rounded-full flex items-center justify-center"
-                  style={{ minWidth: "3rem" }}
-                >
-                  <FaArrowRight size={15} className="text-white" />
-                </span>
+              <button className="bg-[#2E2E2E] text-white px-2 py-2 rounded-full flex items-center justify-center">
+                <p className="text-[16px]">Contact us</p>
+                <FaArrowRight
+                  size={24}
+                  className="text-white bg-[#2563EB] rounded-full p-1 ml-2"
+                />
               </button>
             </Link>
           </div>
@@ -96,12 +89,12 @@ const Header: React.FC = () => {
               </Link>
             ))}
             <Link href="/contact" onClick={() => setIsOpen(false)}>
-              <button
-                className="bg-black text-white px-6 py-2 rounded-full flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500"
-                type="button"
-              >
-                <span className="mr-2 font-bold">Contact Us</span>
-                <FaArrowRight size={15} />
+              <button className="bg-[#2E2E2E] text-white px-2 py-2 rounded-full flex items-center justify-center">
+                <p className="text-[16px]">Contact us</p>
+                <FaArrowRight
+                  size={24}
+                  className="text-white bg-[#2563EB] rounded-full p-1 ml-2"
+                />
               </button>
             </Link>
           </div>

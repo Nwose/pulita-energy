@@ -8,7 +8,10 @@ const Products = () => {
       <ServiceHeader />
       <ProjectSub />
 
-      <PowerUp />
+      {/* Full-width PowerUp Section */}
+      <div className="-mx-4">
+        <PowerUp />
+      </div>
     </div>
   );
 };

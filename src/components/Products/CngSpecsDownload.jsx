@@ -1,26 +1,3 @@
-// import cngSpecs from "../../data/cngSpecs.json";
-
-// const CngSpecsDownload = () => (
-//   <section className="mt-12">
-//     <h2 className="text-2xl font-bold mb-4">CNG Generator Specifications</h2>
-//     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//       {cngSpecs.map((spec, idx) => (
-//         <a
-//           key={idx}
-//           href={`/pdfs/cng/${spec.file}`}
-//           download
-//           className="flex items-center justify-between bg-white rounded-lg shadow p-4 hover:bg-blue-50 transition"
-//         >
-//           <span>{spec.name}</span>
-//           <span className="text-blue-600 font-semibold">Download PDF</span>
-//         </a>
-//       ))}
-//     </div>
-//   </section>
-// );
-
-// export default CngSpecsDownload;
-
 import cngSpecs from "../../data/cngSpecs.json";
 
 const CngSpecsDownload = () => (

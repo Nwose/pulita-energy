@@ -7,7 +7,9 @@ const Projects = () => {
     <div className="min-h-screen bg-slate-50 py-12 px-4">
       <ServiceProjectHead />
       <ProjectSectionCard />
-      <PowerUp />
+      <div className="-mx-4">
+        <PowerUp />
+      </div>
     </div>
   );
 };

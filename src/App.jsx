@@ -9,7 +9,6 @@ import Projects from "./pages/Projects";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import ProjectDetails from "./pages/ProjectDetails";
-import ExtraProjectDetails from "./pages/ExtraProjectDetails";
 
 function App() {
   return (
@@ -22,10 +21,6 @@ function App() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/projects/:id" element={<ProjectDetails />} />
-        <Route
-          path="/extra-project-details"
-          element={<ExtraProjectDetails />}
-        />
       </Routes>
       <Footer />
     </BrowserRouter>

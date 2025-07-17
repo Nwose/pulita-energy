@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaGasPump,
   FaPlug,
@@ -15,7 +15,6 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
-import productData from "../../data/productData.json";
 import Image from "next/image";
 
 // Icon and image maps
@@ -60,13 +59,12 @@ const Card: React.FC<CardProps> = ({
   details,
   pdfs,
 }) => {
-  const primaryPdf = pdfs?.[0];
   return (
     <motion.div
       whileHover="hover"
-      className="relative overflow-hidden rounded-2xl shadow-md flex flex-col md:flex-row-reverse w-full max-w-[640px] mx-auto group bg-white h-[180px]"
+      className="relative overflow-hidden rounded-2xl shadow-lg flex flex-col md:flex-row-reverse w-full max-w-[660px] mx-auto group bg-white"
     >
-      {/* SVG Line */}
+      {/* SVG Background - Left Side Vertical Line */}
       <motion.div
         variants={{
           hover: { x: 0, opacity: 1 },
@@ -81,91 +79,138 @@ const Card: React.FC<CardProps> = ({
           backgroundSize: "cover",
         }}
       />
-      {/* Image Section */}
-      <div className="w-full md:w-1/2 h-full">
+
+      {/* Image */}
+      <div className="w-full md:w-1/2 h-40 md:h-full">
         <Image
           src={image}
           alt={title}
           width={300}
-          height={180}
+          height={160}
           className="w-full h-full object-cover rounded-none md:rounded-r-2xl"
         />
       </div>
-      {/* Text + Buttons */}
-      <div className="w-full md:w-1/2 p-3 flex flex-col justify-between bg-[#efeded] relative z-10 rounded-l-2xl md:rounded-none">
-        <div>
-          <h2 className="text-base font-semibold text-gray-900">{title}</h2>
-          <p className="text-xs text-gray-600 mt-1 leading-snug">{text}</p>
-        </div>
-        {/* Icons */}
-        <div className="flex gap-2 mt-2">
-          {icons.map((icon, index) => {
-            const Icon = iconMap[icon];
-            return (
-              <div
-                key={index}
-                className="p-1.5 bg-[#1f1f1f]/70 text-white rounded-full"
-              >
-                {Icon && <Icon size={14} />}
-              </div>
-            );
-          })}
-        </div>
-        {/* Buttons */}
-        <div className="flex gap-2 mt-3">
-          <button className="bg-[#28231d] text-white px-3 py-1 rounded-full text-xs font-semibold">
-            Learn More
-          </button>
-          {primaryPdf && (
-            <a
-              href={`/pdfs/cng/${primaryPdf.file}`}
-              download
-              className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
-            >
-              Download
-              <FaArrowRight className="w-3 h-3" />
-            </a>
+
+      {/* Text Content */}
+      <div className="w-full md:w-1/2 h-full flex flex-col p-4 bg-[#efeded] relative z-10 rounded-l-2xl md:rounded-none">
+        <div className="flex-1 flex flex-col">
+          <h2 className="text-lg font-semibold mb-2">{title}</h2>
+          <p className="text-sm text-gray-600 mb-4">{text}</p>
+
+          {/* Icon Row */}
+          <div className="flex gap-3 mb-4">
+            {icons.map((iconName, index) => {
+              const IconComponent = iconMap[iconName];
+              return IconComponent ? (
+                <div
+                  key={index}
+                  className="p-2 bg-[#1f1f1f]/70 text-white rounded-full"
+                >
+                  <IconComponent size={16} />
+                </div>
+              ) : null;
+            })}
+          </div>
+
+          {/* PDF Downloads */}
+          {pdfs && pdfs.length > 0 && (
+            <div className="space-y-2 mb-2">
+              {pdfs.map((pdf, index) => (
+                <a
+                  key={index}
+                  href={pdf.file}
+                  download
+                  className="block text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                >
+                  📄 {pdf.name}
+                </a>
+              ))}
+            </div>
           )}
         </div>
+        <button className="bg-[#28231d] text-gray-100 px-4 py-2 rounded-full text-sm w-fit font-bold mt-2">
+          Learn More
+        </button>
       </div>
     </motion.div>
   );
 };
 
-const CardGrid: React.FC = () => (
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    {productData.map((item, index) => (
-      <Card
-        key={index}
-        title={item.title}
-        text={item.text}
-        image={imageMap[item.image]}
-        icons={item.icons}
-        details={item.details}
-        pdfs={item.pdfs}
-      />
-    ))}
-  </div>
-);
+const CardGrid: React.FC = () => {
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-const ProjectSub: React.FC = () => (
-  <section className="bg-gray-50 px-6 py-16 font-satoshi">
-    <div className="max-w-7xl mx-auto">
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center px-4 py-2 bg-[#dad8d8] text-[#666666] rounded-full text-sm font-bold shadow-sm mb-6">
-          Our Product
-        </div>
-        <h2 className="text-3xl font-bold text-gray-800">
-          Smart Power For a Cleaner Future
-        </h2>
-        <p className="text-gray-500 mt-2">
-          Pulita Energy delivers sustainable, high-performance power solutions
-          built for durability, efficiency, and global standards.
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const response = await fetch("/api/products");
+        if (response.ok) {
+          const data = await response.json();
+          setProducts(data);
+        } else {
+          setError("Failed to fetch products from database");
+        }
+      } catch (err) {
+        setError("Failed to fetch products from database");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="w-full max-w-[660px] h-[205px] mx-auto bg-gray-200 rounded-2xl animate-pulse"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-600 mb-4">{error}</p>
+        <p className="text-gray-500 text-sm">
+          Please check your database connection or contact an administrator.
         </p>
       </div>
-      <CardGrid />
-    </div>
-  </section>
-);
+    );
+  }
 
-export default ProjectSub;
+  if (products.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-600 mb-4">No products available yet.</p>
+        <p className="text-gray-500 text-sm">
+          Products will appear here once they are added through the admin panel.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {products.map((item, index) => (
+        <Card
+          key={index}
+          title={item.title}
+          text={item.text}
+          image={imageMap[item.image] || item.image}
+          icons={item.icons}
+          details={item.details}
+          pdfs={item.pdfs}
+        />
+      ))}
+    </div>
+  );
+};
+
+export default CardGrid;

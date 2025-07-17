@@ -1,30 +1,43 @@
+export const dynamic = "force-dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-type BlogDetailPageProps = { params: Promise<{ slug: string }> };
-
 async function getBlog(slug: string) {
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : process.env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : "";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    (process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
 
-  const res = await fetch(`${baseUrl}/api/blogs/${encodeURIComponent(slug)}`, {
-    cache: "no-store",
-    next: { revalidate: 0 },
-  }).catch(() => null);
+  try {
+    const res = await fetch(
+      `${baseUrl}/api/blogs/${encodeURIComponent(slug)}`,
+      {
+        cache: "no-store",
+        next: { revalidate: 0 },
+      }
+    );
 
-  if (!res || !res.ok) return null;
-  return res.json();
+    if (!res.ok) return null;
+    return res.json();
+  } catch (err) {
+    console.error("Fetch blog error:", err);
+    return null;
+  }
 }
 
-export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
+export default async function BlogDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
+  console.log("Blog slug:", slug);
   if (!slug) return notFound();
 
   const data = await getBlog(slug);
+  console.log("Fetched blog data:", data);
   const blog = data?.blog;
 
   if (!blog) return notFound();

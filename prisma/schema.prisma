@@ -15,14 +15,14 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
+  id        String    @id @default(uuid())
+  email     String    @unique
   password  String
-  role      String   @default("admin") // 'admin' or 'superadmin'
-  createdAt DateTime @default(now())
-  blogs     Blog[]   @relation("UserBlogs")
-  projects  Project[] @relation("UserProjects")
+  createdAt DateTime  @default(now())
+  role      String    @default("admin")
+  blogs     Blog[]    @relation("UserBlogs")
   products  Product[] @relation("UserProducts")
+  projects  Project[] @relation("UserProjects")
 }
 
 model Blog {
@@ -38,35 +38,34 @@ model Blog {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   authorId     String?
-  user         User?    @relation(fields: [authorId], references: [id], name: "UserBlogs")
+  user         User?    @relation("UserBlogs", fields: [authorId], references: [id])
 }
 
 model Project {
-  id          String   @id @default(uuid())
-  name        String
-  summary     String
-  date        String
-  images      String[]
-  details     String
-  challenges  String[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  authorId    String?
-  user        User?    @relation(fields: [authorId], references: [id], name: "UserProjects")
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  authorId   String?
+  challenges String[]
+  date       String
+  details    String
+  images     String[]
+  name       String
+  summary    String
+  user       User?    @relation("UserProjects", fields: [authorId], references: [id])
 }
 
 model Product {
   id          String   @id @default(uuid())
-  name        String
-  description String
+  title       String
+  text        String
   image       String
-  category    String
-  features    String?
-  specifications String?
-  price       Float?
+  icons       String[] // Array of icon names
+  details     String?
+  pdfs        Json?    // Array of PDF objects: [{name: string, file: string}]
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   authorId    String?
-  user        User?    @relation(fields: [authorId], references: [id], name: "UserProducts")
+  user        User?    @relation("UserProducts", fields: [authorId], references: [id])
 }

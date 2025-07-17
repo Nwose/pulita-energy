@@ -8,7 +8,7 @@ export interface AboutHeroSectionProps {
 }
 
 const AboutHeroSection: React.FC<AboutHeroSectionProps> = ({
-  src = "/assets/AboutHero.jpg",
+  src = "/assets/team-pic.jpg",
   isVisible,
 }) => (
   <div className="relative rounded-3xl overflow-visible shadow-xl mb-28">

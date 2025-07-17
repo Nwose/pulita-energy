@@ -16,7 +16,7 @@ const AboutPage: React.FC = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-20 px-4 lg:px-8 font-satoshi ">
+    <section className="relative min-h-screen py-20 px-4 lg:px-8 font-satoshi ">
       <div className="max-w-7xl mx-auto">
         <AboutHeader />
         <AboutHeroSection isVisible={isVisible} />

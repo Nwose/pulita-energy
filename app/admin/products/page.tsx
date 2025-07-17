@@ -2,37 +2,101 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+  FaGasPump,
+  FaPlug,
+  FaLeaf,
+  FaBolt,
+  FaHome,
+  FaCog,
+  FaBus,
+  FaGlobe,
+  FaFlask,
+  FaTachometerAlt,
+  FaLock,
+  FaPlus,
+  FaTrash,
+} from "react-icons/fa";
 
 interface Product {
   id: string;
-  name: string;
-  description: string;
+  title: string;
+  text: string;
   image: string;
-  category: string;
-  features?: string;
-  specifications?: string;
-  price?: number;
+  icons: string[];
+  details?: string;
+  pdfs?: { name: string; file: string }[];
   isActive: boolean;
 }
 
-// Helper function to validate image URLs
-function isValidImageUrl(url: string): boolean {
-  if (!url) return false;
-  try {
-    const urlObj = new URL(url);
-    return urlObj.protocol === "http:" || urlObj.protocol === "https:";
-  } catch {
-    return false;
-  }
+interface ProductForm {
+  title: string;
+  text: string;
+  image: string;
+  icons: string[];
+  details: string;
+  pdfs: { name: string; file: string }[];
+  isActive: boolean;
 }
+
+// Icon map for preview
+const iconMap: Record<string, React.ElementType> = {
+  FaGasPump,
+  FaPlug,
+  FaLeaf,
+  FaBolt,
+  FaHome,
+  FaCog,
+  FaBus,
+  FaGlobe,
+  FaFlask,
+  FaTachometerAlt,
+  FaLock,
+};
+
+// Available icons for selection
+const availableIcons = [
+  "FaGasPump",
+  "FaPlug",
+  "FaLeaf",
+  "FaBolt",
+  "FaHome",
+  "FaCog",
+  "FaBus",
+  "FaGlobe",
+  "FaFlask",
+  "FaTachometerAlt",
+  "FaLock",
+];
+
+// Image map for preview
+const imageMap: Record<string, string> = {
+  cng: "/assets/cng.png",
+  cylinder: "/assets/cylinder.png",
+  lpg: "/assets/lpg.png",
+  prms: "/assets/prms.png",
+  Dual: "/assets/Dual.png",
+  skids: "/assets/skids.png",
+  kits: "/assets/kits.png",
+};
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [form, setForm] = useState<Partial<Product>>({});
+  const [form, setForm] = useState<ProductForm>({
+    title: "",
+    text: "",
+    image: "",
+    icons: [],
+    details: "",
+    pdfs: [],
+    isActive: true,
+  });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [newPdfName, setNewPdfName] = useState("");
   const router = useRouter();
 
   async function fetchProducts() {
@@ -81,6 +145,44 @@ export default function AdminProductsPage() {
     }
   }
 
+  async function handlePdfUpload(file: File) {
+    if (!newPdfName.trim()) {
+      setError("Please enter a name for the PDF");
+      return;
+    }
+
+    setUploadingPdf(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/upload-pdf", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const newPdf = {
+          name: newPdfName,
+          file: data.url,
+        };
+        setForm({
+          ...form,
+          pdfs: [...form.pdfs, newPdf],
+        });
+        setNewPdfName("");
+        setError("");
+      } else {
+        setError("PDF upload failed");
+      }
+    } catch (err) {
+      setError("PDF upload failed");
+    } finally {
+      setUploadingPdf(false);
+    }
+  }
+
   function handleChange(
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -95,6 +197,22 @@ export default function AdminProductsPage() {
     }
   }
 
+  function handleIconToggle(iconName: string) {
+    setForm({
+      ...form,
+      icons: form.icons.includes(iconName)
+        ? form.icons.filter((icon) => icon !== iconName)
+        : [...form.icons, iconName],
+    });
+  }
+
+  function removePdf(index: number) {
+    setForm({
+      ...form,
+      pdfs: form.pdfs.filter((_, i) => i !== index),
+    });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -107,7 +225,15 @@ export default function AdminProductsPage() {
     });
     setLoading(false);
     if (res.ok) {
-      setForm({});
+      setForm({
+        title: "",
+        text: "",
+        image: "",
+        icons: [],
+        details: "",
+        pdfs: [],
+        isActive: true,
+      });
       setEditingId(null);
       setError("");
       fetchProducts();
@@ -118,7 +244,15 @@ export default function AdminProductsPage() {
   }
 
   function handleEdit(product: Product) {
-    setForm(product);
+    setForm({
+      title: product.title,
+      text: product.text,
+      image: product.image,
+      icons: product.icons,
+      details: product.details || "",
+      pdfs: product.pdfs || [],
+      isActive: product.isActive,
+    });
     setEditingId(product.id);
   }
 
@@ -133,6 +267,57 @@ export default function AdminProductsPage() {
     setLoading(false);
     if (res.ok) fetchProducts();
   }
+
+  // Preview component
+  const ProductPreview = () => {
+    const previewImage = imageMap[form.image] || form.image;
+    return (
+      <div className="bg-white border rounded-lg p-4 shadow-sm">
+        <h4 className="font-semibold mb-3 text-gray-700">Preview</h4>
+        <div className="relative overflow-hidden rounded-lg shadow-md flex flex-col md:flex-row-reverse w-full max-w-[400px] h-[200px] mx-auto group bg-white">
+          {/* Image */}
+          <div className="w-full md:w-1/2 h-32 md:h-full">
+            {previewImage ? (
+              <img
+                src={previewImage}
+                alt={form.title}
+                className="w-full h-full object-cover rounded-none md:rounded-r-lg"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-400">No image</span>
+              </div>
+            )}
+          </div>
+
+          {/* Text Content */}
+          <div className="w-full md:w-1/2 p-3 flex flex-col justify-between bg-[#efeded] relative z-10 rounded-l-lg md:rounded-none">
+            <h2 className="text-sm font-semibold">
+              {form.title || "Product Title"}
+            </h2>
+            <p className="text-xs text-gray-600 mt-1 flex-1">
+              {form.text || "Product description"}
+            </p>
+
+            {/* Icon Row */}
+            <div className="flex gap-2 mt-2">
+              {form.icons.map((iconName, index) => {
+                const IconComponent = iconMap[iconName];
+                return IconComponent ? (
+                  <div
+                    key={index}
+                    className="p-1 bg-[#1f1f1f]/70 text-white rounded-full"
+                  >
+                    <IconComponent size={12} />
+                  </div>
+                ) : null;
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -190,191 +375,216 @@ export default function AdminProductsPage() {
             Product Management
           </h2>
 
-          {/* Product Form */}
-          <form onSubmit={handleSubmit} className="mb-12 space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                  Product Name
-                </label>
-                <input
-                  name="name"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-lg"
-                  value={form.name || ""}
-                  onChange={handleChange}
-                  placeholder="Enter product name..."
-                  required
-                />
-              </div>
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                  Category
-                </label>
-                <input
-                  name="category"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                  value={form.category || ""}
-                  onChange={handleChange}
-                  placeholder="e.g., Solar Panels, Inverters, etc."
-                  required
-                />
-              </div>
-            </div>
-
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Product Form */}
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Description
-              </label>
-              <textarea
-                name="description"
-                className="w-full border border-gray-300 rounded-lg px-4 py-4 text-base leading-relaxed"
-                rows={4}
-                value={form.description || ""}
-                onChange={handleChange}
-                placeholder="Describe the product features and benefits..."
-                required
-              />
-            </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    Product Title
+                  </label>
+                  <input
+                    name="title"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-lg"
+                    value={form.title}
+                    onChange={handleChange}
+                    placeholder="Enter product title..."
+                    required
+                  />
+                </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                  Features
-                </label>
-                <textarea
-                  name="features"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                  rows={3}
-                  value={form.features || ""}
-                  onChange={handleChange}
-                  placeholder="List key features of the product..."
-                />
-              </div>
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                  Specifications
-                </label>
-                <textarea
-                  name="specifications"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                  rows={3}
-                  value={form.specifications || ""}
-                  onChange={handleChange}
-                  placeholder="Technical specifications..."
-                />
-              </div>
-            </div>
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    Product Text
+                  </label>
+                  <textarea
+                    name="text"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                    rows={3}
+                    value={form.text}
+                    onChange={handleChange}
+                    placeholder="Enter product description..."
+                    required
+                  />
+                </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                  Price
-                </label>
-                <input
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                  value={form.price || ""}
-                  onChange={handleChange}
-                  placeholder="0.00"
-                />
-              </div>
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                  Product Image
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleImageUpload(file);
-                  }}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                />
-                {form.image && (
-                  <div className="mt-2">
-                    {isValidImageUrl(form.image) ? (
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    Product Image
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageUpload(file);
+                    }}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                  />
+                  {form.image && (
+                    <div className="mt-2">
                       <img
                         src={form.image}
                         alt="Preview"
                         className="w-32 h-20 object-cover rounded"
                       />
-                    ) : (
-                      <div className="w-32 h-20 bg-gray-200 rounded flex items-center justify-center text-gray-400">
-                        <svg
-                          className="w-8 h-8"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
+                    </div>
+                  )}
+                  {uploading && (
+                    <p className="text-sm text-gray-500 mt-1">Uploading...</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    Icons
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {availableIcons.map((iconName) => {
+                      const IconComponent = iconMap[iconName];
+                      return (
+                        <button
+                          key={iconName}
+                          type="button"
+                          onClick={() => handleIconToggle(iconName)}
+                          className={`p-3 border rounded-lg flex items-center justify-center transition-colors ${
+                            form.icons.includes(iconName)
+                              ? "bg-blue-100 border-blue-300 text-blue-700"
+                              : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
+                          }`}
                         >
-                          <path
-                            fillRule="evenodd"
-                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                          {IconComponent && <IconComponent size={20} />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    Details
+                  </label>
+                  <textarea
+                    name="details"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                    rows={3}
+                    value={form.details}
+                    onChange={handleChange}
+                    placeholder="Enter product details..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    PDF Files
+                  </label>
+                  <div className="space-y-3">
+                    {form.pdfs.map((pdf, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      >
+                        <span className="text-sm font-medium">{pdf.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removePdf(index)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <FaTrash size={16} />
+                        </button>
                       </div>
+                    ))}
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="PDF name"
+                        value={newPdfName}
+                        onChange={(e) => setNewPdfName(e.target.value)}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
+                      />
+                      <input
+                        type="file"
+                        accept=".pdf"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handlePdfUpload(file);
+                        }}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
+                      />
+                    </div>
+                    {uploadingPdf && (
+                      <p className="text-sm text-gray-500">Uploading PDF...</p>
                     )}
                   </div>
+                </div>
+
+                <div className="flex items-center">
+                  <label className="flex items-center">
+                    <input
+                      name="isActive"
+                      type="checkbox"
+                      className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                      checked={form.isActive}
+                      onChange={handleChange}
+                    />
+                    <span className="ml-2 text-sm text-gray-700">
+                      Active Product
+                    </span>
+                  </label>
+                </div>
+
+                {error && (
+                  <div className="text-red-600 bg-red-50 p-3 rounded-lg">
+                    {error}
+                  </div>
                 )}
-                {uploading && (
-                  <p className="text-sm text-gray-500 mt-1">Uploading...</p>
-                )}
-              </div>
-              <div className="flex items-center">
-                <label className="flex items-center">
-                  <input
-                    name="isActive"
-                    type="checkbox"
-                    className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                    checked={form.isActive !== false}
-                    onChange={handleChange}
-                  />
-                  <span className="ml-2 text-sm text-gray-700">
-                    Active Product
-                  </span>
-                </label>
-              </div>
+
+                <div className="flex gap-4">
+                  <button
+                    type="submit"
+                    className="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition disabled:opacity-50"
+                    disabled={loading || uploading}
+                  >
+                    {loading
+                      ? editingId
+                        ? "Saving..."
+                        : "Creating..."
+                      : editingId
+                      ? "Update Product"
+                      : "Create Product"}
+                  </button>
+                  {editingId && (
+                    <button
+                      type="button"
+                      className="text-gray-500 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
+                      onClick={() => {
+                        setEditingId(null);
+                        setForm({
+                          title: "",
+                          text: "",
+                          image: "",
+                          icons: [],
+                          details: "",
+                          pdfs: [],
+                          isActive: true,
+                        });
+                      }}
+                    >
+                      Cancel Edit
+                    </button>
+                  )}
+                </div>
+              </form>
             </div>
 
-            {error && (
-              <div className="text-red-600 bg-red-50 p-3 rounded-lg">
-                {error}
-              </div>
-            )}
-
-            <div className="flex gap-4">
-              <button
-                type="submit"
-                className="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition disabled:opacity-50"
-                disabled={loading || uploading}
-              >
-                {loading
-                  ? editingId
-                    ? "Saving..."
-                    : "Creating..."
-                  : editingId
-                  ? "Update Product"
-                  : "Create Product"}
-              </button>
-              {editingId && (
-                <button
-                  type="button"
-                  className="text-gray-500 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  onClick={() => {
-                    setEditingId(null);
-                    setForm({});
-                  }}
-                >
-                  Cancel Edit
-                </button>
-              )}
+            {/* Preview */}
+            <div>
+              <ProductPreview />
             </div>
-          </form>
+          </div>
 
           {/* Product List */}
-          <div>
+          <div className="mt-12">
             <h3 className="text-lg font-semibold mb-4 text-gray-900">
               All Products
             </h3>
@@ -393,7 +603,7 @@ export default function AdminProductsPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h4 className="font-semibold text-gray-900">
-                            {product.name}
+                            {product.title}
                           </h4>
                           <span
                             className={`px-2 py-1 text-xs rounded-full ${
@@ -406,12 +616,16 @@ export default function AdminProductsPage() {
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 mt-1">
-                          {product.description}
+                          {product.text}
                         </p>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                          <span>Category: {product.category}</span>
-                          {product.price && (
-                            <span>Price: ${product.price}</span>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="text-xs text-gray-500">
+                            Icons: {product.icons.length}
+                          </span>
+                          {product.pdfs && product.pdfs.length > 0 && (
+                            <span className="text-xs text-gray-500">
+                              PDFs: {product.pdfs.length}
+                            </span>
                           )}
                         </div>
                       </div>

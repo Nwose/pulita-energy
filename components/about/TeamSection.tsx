@@ -3,23 +3,23 @@ import TeamCard, { TeamMember } from "./TeamCard";
 
 const teamMembers: TeamMember[] = [
   {
-    name: "Marcus Johnson",
-    role: "CEO & FOUNDER",
-    image: "/assets/Bio.png",
+    name: "John Wang",
+    role: "CEO",
+    image: "/assets/john.JPG",
     email: "marcus@pulita.com",
     bio: "Passionate about creating innovative solutions that make a real impact on businesses and the environment.",
   },
   {
     name: "Eric Zhao",
     role: "SALES MANAGER",
-    image: "/assets/Bio.png",
+    image: "/assets/eric.jpeg",
     email: "eric@hitepower.com",
     bio: "Dedicated to helping clients find the perfect energy solutions for their unique needs and requirements.",
   },
   {
-    name: "David Rodriguez",
+    name: "Richard Chinemelum Arannonu",
     role: "CTO",
-    image: "/assets/Bio.png",
+    image: "/assets/richard.JPG",
     email: "david@pulita.com",
     bio: "Expert in renewable energy systems with a focus on innovative and scalable solutions.",
   },

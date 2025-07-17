@@ -3,12 +3,9 @@ import { PrismaClient } from "../../../generated/prisma";
 
 const prisma = new PrismaClient();
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(req: NextRequest, context: any) {
   try {
-    const { slug } = await params;
+    const { slug } = context.params;
     const blog = await prisma.blog.findUnique({
       where: { slug },
       select: {

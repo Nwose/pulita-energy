@@ -15,8 +15,6 @@ interface Project {
   [key: string]: any;
 }
 
-type ProjectDetailsPageProps = { params: Promise<{ id: string }> };
-
 const sectionTitles: Record<string, string> = {
   "Solutions Provided": "Solutions Provided",
   "Project Impact": "Project Impact",
@@ -33,7 +31,9 @@ function getProjectById(id: string): {
 
 export default async function ProjectDetailsPage({
   params,
-}: ProjectDetailsPageProps) {
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const { project, index: projectIndex } = getProjectById(id);
 

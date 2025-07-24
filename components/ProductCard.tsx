@@ -15,22 +15,24 @@ import {
 import { motion } from "framer-motion";
 import Image from "next/image";
 import React from "react";
+import Link from "next/link";
 
 // Card Props
 interface CardProps {
+  id: string;
   title: string;
   text: string;
   image: string; // path relative to /public/assets
   icons: React.ComponentType<{ size?: number }>[];
 }
 
-const Card: React.FC<CardProps> = ({ title, text, image, icons }) => {
+const Card: React.FC<CardProps> = ({ id, title, text, image, icons }) => {
   return (
     <motion.div
       whileHover="hover"
       className="relative overflow-hidden rounded-2xl shadow-lg flex flex-col md:flex-row-reverse w-full max-w-[660px] h-[205px] mx-auto group bg-white"
     >
-      {/* SVG Background - Left Side Vertical Line */}
+      {/* Left SVG Background */}
       <motion.div
         variants={{
           hover: { x: 0, opacity: 1 },
@@ -46,7 +48,7 @@ const Card: React.FC<CardProps> = ({ title, text, image, icons }) => {
         }}
       />
 
-      {/* Image */}
+      {/* Product Image */}
       <div className="w-full md:w-1/2 h-40 md:h-full">
         <Image
           src={image}
@@ -57,12 +59,12 @@ const Card: React.FC<CardProps> = ({ title, text, image, icons }) => {
         />
       </div>
 
-      {/* Text Content */}
+      {/* Product Info */}
       <div className="w-full md:w-1/2 p-4 flex flex-col justify-between bg-[#efeded] relative z-10 rounded-l-2xl md:rounded-none">
         <h2 className="text-lg font-semibold">{title}</h2>
         <p className="text-sm text-gray-600 mt-2 flex-1">{text}</p>
 
-        {/* Icon Row */}
+        {/* Icons */}
         <div className="flex gap-3 mt-3">
           {icons.map((Icon, index) => (
             <div
@@ -74,9 +76,13 @@ const Card: React.FC<CardProps> = ({ title, text, image, icons }) => {
           ))}
         </div>
 
-        <button className="mt-3 bg-[#28231d] text-gray-100 px-4 py-2 rounded-full text-sm w-fit font-bold">
-          Learn More
-        </button>
+        {/* Learn More Button with Routing */}
+        <Link
+          href={`/products/${id}`}
+          className="inline-flex items-center gap-2 px-3 py-1.5 bg-black text-white rounded-full transition w-fit mt-4"
+        >
+          Learn More <FaArrowRight />
+        </Link>
       </div>
     </motion.div>
   );
@@ -86,24 +92,28 @@ const Card: React.FC<CardProps> = ({ title, text, image, icons }) => {
 const CardGrid: React.FC = () => {
   const cards = [
     {
+      id: "lpg",
       title: "LPG Generator Sets",
       text: "Save money, reduce emissions, and ensure peace of mind.",
       image: "/assets/lpg.png",
       icons: [FaGasPump, FaPlug, FaLeaf],
     },
     {
+      id: "cng",
       title: "CNG Generator Sets",
       text: "No more fuel stress or blackouts—just sustainable power.",
       image: "/assets/cng.png",
       icons: [FaBolt, FaLeaf, FaHome],
     },
     {
+      id: "cylinder",
       title: "CNG Cylinder",
       text: "Enjoy clean energy without the noise or high cost.",
       image: "/assets/cylinder.png",
       icons: [FaCog, FaBus, FaGlobe],
     },
     {
+      id: "prms",
       title: "PRMS",
       text: "Advanced pressure reduction and metering solutions.",
       image: "/assets/prms.png",
@@ -116,6 +126,7 @@ const CardGrid: React.FC = () => {
       {cards.map((card, index) => (
         <Card
           key={index}
+          id={card.id}
           title={card.title}
           text={card.text}
           image={card.image}

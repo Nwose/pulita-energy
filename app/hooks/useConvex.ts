@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { Id } from "../../convex/_generated/dataModel";
 
 export function useProducts() {
   return useQuery(api.products.getProducts);
@@ -19,7 +20,7 @@ export function useBlog(slug: string) {
   return useQuery(api.blogs.getBlog, { slug });
 }
 
-export function useProject(id: string) {
+export function useProject(id: Id<"projects">) {
   return useQuery(api.projects.getProject, { id });
 }
 

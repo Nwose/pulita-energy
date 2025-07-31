@@ -19,11 +19,12 @@ interface Product {
 export default async function ProductDetails({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const { default: products } = await import("../../data/products.json");
 
-  const product = products.find((p) => p.id === params.id) as Product;
+  const product = products.find((p) => p.id === id) as Product;
 
   if (!product) return notFound();
 

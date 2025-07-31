@@ -1,7 +1,11 @@
-import { PrismaClient } from '../app/generated/prisma/index.js';
-import bcrypt from 'bcryptjs';
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '../convex/_generated/api.js';
+import { config } from 'dotenv';
 
-const prisma = new PrismaClient();
+// Load environment variables
+config({ path: '.env.local' });
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL);
 
 async function createSuperAdmin() {
     const email = 'admin@pulita.com';
@@ -9,35 +13,25 @@ async function createSuperAdmin() {
     const role = 'superadmin';
 
     try {
-        // Check if user already exists
-        const existing = await prisma.user.findUnique({ where: { email } });
-        if (existing) {
-            console.log('Superadmin already exists:', email);
-            return;
-        }
-
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create superadmin
-        const user = await prisma.user.create({
-            data: {
-                email,
-                password: hashedPassword,
-                role,
-            },
+        // Create superadmin using Convex
+        const result = await convex.mutation(api.auth.register, {
+            email,
+            password,
+            role,
         });
 
         console.log('Superadmin created successfully:');
         console.log('Email:', email);
         console.log('Password:', password);
         console.log('Role:', role);
-        console.log('ID:', user.id);
+        console.log('ID:', result.id);
 
     } catch (error) {
-        console.error('Error creating superadmin:', error);
-    } finally {
-        await prisma.$disconnect();
+        if (error.message?.includes('already exists')) {
+            console.log('Superadmin already exists:', email);
+        } else {
+            console.error('Error creating superadmin:', error);
+        }
     }
 }
 

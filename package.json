@@ -5,21 +5,21 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "postinstall": "prisma generate"
+    "convex:dev": "convex dev"
   },
   "dependencies": {
-    "@prisma/client": "^6.12.0",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
+    "convex": "^1.25.4",
+    "dotenv": "^17.2.1",
     "emailjs-com": "^3.2.0",
     "framer-motion": "^12.23.0",
     "jsonwebtoken": "^9.0.2",
     "motion": "^12.18.1",
     "next": "^15.4.3",
-    "prisma": "^6.10.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0"

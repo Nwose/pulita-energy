@@ -1,31 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "../../generated/prisma";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../../../convex/_generated/api";
 
-const prisma = new PrismaClient();
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(req: NextRequest) {
   try {
-    const blogs = await prisma.blog.findMany({
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        excerpt: true,
-        content: true,
-        image: true,
-        author: true,
-        authorAvatar: true,
-        date: true,
-        createdAt: true,
-      },
-    });
+    const blogs = await convex.query(api.blogs.getBlogs);
 
-    return NextResponse.json({ blogs });
+    const transformedBlogs = blogs.map((blog: any) => ({
+      id: blog._id,
+      title: blog.title,
+      slug: blog.slug,
+      excerpt: blog.excerpt,
+      content: blog.content,
+      image: blog.image,
+      author: blog.author,
+      authorAvatar: blog.authorAvatar,
+      date: blog.date,
+      createdAt: blog.createdAt,
+    }));
+
+    return NextResponse.json({ blogs: transformedBlogs });
   } catch (error) {
-    console.error("Error fetching blogs:", error);
+    console.error("Error fetching blogs from Convex:", error);
     return NextResponse.json(
-      { error: "Failed to fetch blogs" },
+      { error: "Failed to fetch blogs from Convex" },
       { status: 500 }
     );
   }

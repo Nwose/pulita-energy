@@ -2,6 +2,7 @@ import "../index.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import React from "react";
+import { Providers } from "./providers";
 
 export const metadata = {
   title: "Pulita Energy",
@@ -16,9 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-satoshi bg-white text-gray-900">
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <Providers>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

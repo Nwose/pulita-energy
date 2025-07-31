@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "../../../generated/prisma";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../../../../convex/_generated/api";
 import jwt from "jsonwebtoken";
 
-const prisma = new PrismaClient();
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 
 function getUserFromRequest(req: NextRequest) {
@@ -20,23 +21,40 @@ function getUserFromRequest(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const user = getUserFromRequest(req);
-  if (!user || user.role !== "superadmin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  try {
+    const user = getUserFromRequest(req);
+    if (!user || user.role !== "superadmin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const users = await convex.query(api.auth.getUsers);
+    return NextResponse.json({ users });
+  } catch (error) {
+    console.error("Error fetching users from Convex:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch users from Convex" },
+      { status: 500 }
+    );
   }
-  const users = await prisma.user.findMany({
-    select: { id: true, email: true, role: true, createdAt: true },
-  });
-  return NextResponse.json({ users });
 }
 
 export async function DELETE(req: NextRequest) {
-  const user = getUserFromRequest(req);
-  if (!user || user.role !== "superadmin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  try {
+    const user = getUserFromRequest(req);
+    if (!user || user.role !== "superadmin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { id } = await req.json();
+    if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
+
+    await convex.mutation(api.auth.deleteUser, { id });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting user in Convex:", error);
+    return NextResponse.json(
+      { error: "Failed to delete user in Convex" },
+      { status: 500 }
+    );
   }
-  const { id } = await req.json();
-  if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
-  await prisma.user.delete({ where: { id } });
-  return NextResponse.json({ success: true });
 }

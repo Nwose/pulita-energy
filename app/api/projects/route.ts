@@ -1,20 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "../../generated/prisma";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../../../convex/_generated/api";
 
-const prisma = new PrismaClient();
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(req: NextRequest) {
-  const projects = await prisma.project.findMany({
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      name: true,
-      summary: true,
-      date: true,
-      images: true,
-      details: true,
-      challenges: true,
-    },
-  });
-  return NextResponse.json({ projects });
+  try {
+    const projects = await convex.query(api.projects.getProjects);
+
+    const transformedProjects = projects.map((project: any) => ({
+      id: project._id,
+      name: project.name,
+      summary: project.summary,
+      date: project.date,
+      images: project.images,
+      details: project.details,
+      challenges: project.challenges,
+    }));
+
+    return NextResponse.json({ projects: transformedProjects });
+  } catch (error) {
+    console.error("Error fetching projects from Convex:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch projects from Convex" },
+      { status: 500 }
+    );
+  }
 }

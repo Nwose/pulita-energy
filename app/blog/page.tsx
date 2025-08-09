@@ -41,7 +41,7 @@ export default function BlogPage() {
         } else {
           setError("Failed to load blogs");
         }
-      } catch (err) {
+      } catch {
         setError("Failed to load blogs");
       } finally {
         setLoading(false);

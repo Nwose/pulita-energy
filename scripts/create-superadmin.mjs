@@ -1,38 +1,29 @@
-import { ConvexHttpClient } from 'convex/browser';
-import { api } from '../convex/_generated/api.js';
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../convex/_generated/api.js";
 import { config } from 'dotenv';
-
-// Load environment variables
 config({ path: '.env.local' });
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL);
 
-async function createSuperAdmin() {
-    const email = 'admin@pulita.com';
-    const password = 'admin123';
-    const role = 'superadmin';
-
+async function createSuperadmin() {
     try {
-        // Create superadmin using Convex
+        console.log("Creating superadmin user...");
+
         const result = await convex.mutation(api.auth.register, {
-            email,
-            password,
-            role,
+            email: "superadmin@pulitaenergy.ng",
+            password: "superadmin123",
+            role: "superadmin"
         });
 
-        console.log('Superadmin created successfully:');
-        console.log('Email:', email);
-        console.log('Password:', password);
-        console.log('Role:', role);
-        console.log('ID:', result.id);
+        console.log("✅ Superadmin created successfully!");
+        console.log("Email: superadmin@pulitaenergy.ng");
+        console.log("Password: superadmin123");
+        console.log("Role: superadmin");
+        console.log("User ID:", result.id);
 
     } catch (error) {
-        if (error.message?.includes('already exists')) {
-            console.log('Superadmin already exists:', email);
-        } else {
-            console.error('Error creating superadmin:', error);
-        }
+        console.error("❌ Error creating superadmin:", error.message);
     }
 }
 
-createSuperAdmin(); 
+createSuperadmin(); 

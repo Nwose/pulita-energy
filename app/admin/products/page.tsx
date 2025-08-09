@@ -3,19 +3,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
+  FaBolt,
+  FaLeaf,
+  FaHome,
   FaGasPump,
   FaPlug,
-  FaLeaf,
-  FaBolt,
-  FaHome,
   FaCog,
   FaBus,
   FaGlobe,
   FaFlask,
   FaTachometerAlt,
   FaLock,
-  FaPlus,
-  FaTrash,
 } from "react-icons/fa";
 
 interface Product {
@@ -25,7 +23,7 @@ interface Product {
   image: string;
   icons: string[];
   details?: string;
-  pdfs?: { name: string; file: string }[];
+  pdfs?: { name: string; file: string; downloadUrl?: string }[];
   isActive: boolean;
 }
 
@@ -35,17 +33,16 @@ interface ProductForm {
   image: string;
   icons: string[];
   details: string;
-  pdfs: { name: string; file: string }[];
+  pdfs: { name: string; file: string; downloadUrl?: string }[];
   isActive: boolean;
 }
 
-// Icon map for preview
-const iconMap: Record<string, React.ElementType> = {
+const iconMap: Record<string, any> = {
+  FaBolt,
+  FaLeaf,
+  FaHome,
   FaGasPump,
   FaPlug,
-  FaLeaf,
-  FaBolt,
-  FaHome,
   FaCog,
   FaBus,
   FaGlobe,
@@ -54,13 +51,12 @@ const iconMap: Record<string, React.ElementType> = {
   FaLock,
 };
 
-// Available icons for selection
 const availableIcons = [
+  "FaBolt",
+  "FaLeaf",
+  "FaHome",
   "FaGasPump",
   "FaPlug",
-  "FaLeaf",
-  "FaBolt",
-  "FaHome",
   "FaCog",
   "FaBus",
   "FaGlobe",
@@ -68,17 +64,6 @@ const availableIcons = [
   "FaTachometerAlt",
   "FaLock",
 ];
-
-// Image map for preview
-const imageMap: Record<string, string> = {
-  cng: "/assets/cng.png",
-  cylinder: "/assets/cylinder.png",
-  lpg: "/assets/lpg.png",
-  prms: "/assets/prms.png",
-  Dual: "/assets/Dual.png",
-  skids: "/assets/skids.png",
-  kits: "/assets/kits.png",
-};
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -99,6 +84,13 @@ export default function AdminProductsPage() {
   const [newPdfName, setNewPdfName] = useState("");
   const router = useRouter();
 
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(""), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   async function fetchProducts() {
     const res = await fetch("/api/admin/products");
     if (res.ok) {
@@ -112,13 +104,6 @@ export default function AdminProductsPage() {
   useEffect(() => {
     fetchProducts();
   }, []);
-
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => setError(""), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [error]);
 
   async function handleImageUpload(file: File) {
     setUploading(true);
@@ -138,7 +123,7 @@ export default function AdminProductsPage() {
       } else {
         setError("Image upload failed");
       }
-    } catch (err) {
+    } catch {
       setError("Image upload failed");
     } finally {
       setUploading(false);
@@ -147,7 +132,7 @@ export default function AdminProductsPage() {
 
   async function handlePdfUpload(file: File) {
     if (!newPdfName.trim()) {
-      setError("Please enter a name for the PDF");
+      setError("Please enter a PDF name");
       return;
     }
 
@@ -163,20 +148,23 @@ export default function AdminProductsPage() {
 
       if (res.ok) {
         const data = await res.json();
-        const newPdf = {
-          name: newPdfName,
-          file: data.url,
-        };
         setForm({
           ...form,
-          pdfs: [...form.pdfs, newPdf],
+          pdfs: [
+            ...form.pdfs,
+            {
+              name: newPdfName,
+              file: data.url,
+              downloadUrl: data.downloadUrl || data.url,
+            },
+          ],
         });
         setNewPdfName("");
         setError("");
       } else {
         setError("PDF upload failed");
       }
-    } catch (err) {
+    } catch {
       setError("PDF upload failed");
     } finally {
       setUploadingPdf(false);
@@ -198,19 +186,23 @@ export default function AdminProductsPage() {
   }
 
   function handleIconToggle(iconName: string) {
-    setForm({
-      ...form,
-      icons: form.icons.includes(iconName)
-        ? form.icons.filter((icon) => icon !== iconName)
-        : [...form.icons, iconName],
-    });
+    const currentIcons = form.icons;
+    if (currentIcons.includes(iconName)) {
+      setForm({
+        ...form,
+        icons: currentIcons.filter((icon) => icon !== iconName),
+      });
+    } else {
+      setForm({
+        ...form,
+        icons: [...currentIcons, iconName],
+      });
+    }
   }
 
   function removePdf(index: number) {
-    setForm({
-      ...form,
-      pdfs: form.pdfs.filter((_, i) => i !== index),
-    });
+    const updatedPdfs = form.pdfs.filter((_, i) => i !== index);
+    setForm({ ...form, pdfs: updatedPdfs });
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -245,10 +237,10 @@ export default function AdminProductsPage() {
 
   function handleEdit(product: Product) {
     setForm({
-      title: product.title,
-      text: product.text,
-      image: product.image,
-      icons: product.icons,
+      title: product.title || "",
+      text: product.text || "",
+      image: product.image || "",
+      icons: product.icons || [],
       details: product.details || "",
       pdfs: product.pdfs || [],
       isActive: product.isActive,
@@ -258,6 +250,13 @@ export default function AdminProductsPage() {
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this product?")) return;
+
+    if (!id) {
+      console.error("No ID provided for deletion");
+      alert("Error: No product ID found");
+      return;
+    }
+
     setLoading(true);
     const res = await fetch("/api/admin/products", {
       method: "DELETE",
@@ -265,38 +264,45 @@ export default function AdminProductsPage() {
       body: JSON.stringify({ id }),
     });
     setLoading(false);
-    if (res.ok) fetchProducts();
+    if (res.ok) {
+      fetchProducts();
+    } else {
+      console.log("Delete failed with status:", res.status);
+    }
   }
 
-  // Preview component
   const ProductPreview = () => {
-    const previewImage = imageMap[form.image] || form.image;
     return (
-      <div className="bg-white border rounded-lg p-4 shadow-sm">
-        <h4 className="font-semibold mb-3 text-gray-700">Preview</h4>
-        <div className="relative overflow-hidden rounded-lg shadow-md flex flex-col md:flex-row-reverse w-full max-w-[400px] h-[200px] mx-auto group bg-white">
-          {/* Image */}
-          <div className="w-full md:w-1/2 h-32 md:h-full">
-            {previewImage ? (
-              <img
-                src={previewImage}
-                alt={form.title}
-                className="w-full h-full object-cover rounded-none md:rounded-r-lg"
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                <span className="text-gray-400">No image</span>
-              </div>
-            )}
-          </div>
-
-          {/* Text Content */}
-          <div className="w-full md:w-1/2 p-3 flex flex-col justify-between bg-[#efeded] relative z-10 rounded-l-lg md:rounded-none">
-            <h2 className="text-sm font-semibold">
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <h3 className="text-lg font-semibold mb-4">Live Preview</h3>
+        <div className="max-w-sm mx-auto">
+          <div className="bg-gray-50 rounded-xl p-6 text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              {form.image ? (
+                <img
+                  src={form.image}
+                  alt={form.title}
+                  className="w-12 h-12 object-cover rounded"
+                />
+              ) : (
+                <svg
+                  className="w-8 h-8 text-blue-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              )}
+            </div>
+            <h4 className="text-lg font-semibold text-gray-900 mb-2">
               {form.title || "Product Title"}
-            </h2>
-            <p className="text-xs text-gray-600 mt-1 flex-1">
-              {form.text || "Product description"}
+            </h4>
+            <p className="text-gray-600 text-sm mb-4">
+              {form.text || "Product description will appear here."}
             </p>
 
             {/* Icon Row */}
@@ -305,7 +311,7 @@ export default function AdminProductsPage() {
                 const IconComponent = iconMap[iconName];
                 return IconComponent ? (
                   <div
-                    key={index}
+                    key={`product-icon-${index}`}
                     className="p-1 bg-[#1f1f1f]/70 text-white rounded-full"
                   >
                     <IconComponent size={12} />
@@ -338,10 +344,10 @@ export default function AdminProductsPage() {
                 Dashboard
               </Link>
               <Link
-                href="/admin/users"
+                href="/admin/blogs"
                 className="text-gray-600 hover:text-gray-800"
               >
-                Users
+                Blogs
               </Link>
               <Link
                 href="/admin/projects"
@@ -354,6 +360,12 @@ export default function AdminProductsPage() {
                 className="text-blue-600 hover:text-blue-800 font-medium"
               >
                 Products
+              </Link>
+              <Link
+                href="/admin/users"
+                className="text-gray-600 hover:text-gray-800"
+              >
+                Users
               </Link>
               <button
                 onClick={async () => {
@@ -481,7 +493,7 @@ export default function AdminProductsPage() {
                   <div className="space-y-3">
                     {form.pdfs.map((pdf, index) => (
                       <div
-                        key={index}
+                        key={`product-pdf-${index}`}
                         className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                       >
                         <span className="text-sm font-medium">{pdf.name}</span>
@@ -490,7 +502,7 @@ export default function AdminProductsPage() {
                           onClick={() => removePdf(index)}
                           className="text-red-600 hover:text-red-800"
                         >
-                          <FaTrash size={16} />
+                          ✕
                         </button>
                       </div>
                     ))}
@@ -550,8 +562,8 @@ export default function AdminProductsPage() {
                         ? "Saving..."
                         : "Creating..."
                       : editingId
-                      ? "Update Product"
-                      : "Create Product"}
+                        ? "Update Product"
+                        : "Create Product"}
                   </button>
                   {editingId && (
                     <button
@@ -595,9 +607,9 @@ export default function AdminProductsPage() {
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {products.map((product) => (
+                  {products.map((product, index) => (
                     <div
-                      key={product.id}
+                      key={product.id || `product-${index}`}
                       className="bg-white p-4 rounded-lg border flex flex-col md:flex-row md:items-center md:justify-between gap-4"
                     >
                       <div className="flex-1">

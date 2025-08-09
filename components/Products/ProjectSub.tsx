@@ -15,6 +15,7 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import Image from "next/image";
 
 // Icon and image maps
@@ -48,96 +49,84 @@ interface CardProps {
   image: string;
   icons: string[];
   details?: string;
-  pdfs?: { name: string; file: string }[];
+  pdfs?: { name: string; file: string; downloadUrl?: string }[];
+  id?: string;
 }
 
-const Card: React.FC<CardProps> = ({
-  title,
-  text,
-  image,
-  icons,
-  details,
-  pdfs,
-}) => {
+const Card: React.FC<CardProps> = ({ title, text, image, icons }) => {
   return (
-    <motion.div
-      whileHover="hover"
-      className="relative overflow-hidden rounded-2xl shadow-lg flex flex-col md:flex-row-reverse w-full max-w-[660px] mx-auto group bg-white"
-    >
-      {/* SVG Background - Left Side Vertical Line */}
+    <Link href={`/products/${encodeURIComponent(title)}`} className="block">
       <motion.div
-        variants={{
-          hover: { x: 0, opacity: 1 },
-          initial: { x: "-100%", opacity: 0 },
-        }}
-        initial="initial"
-        transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="absolute top-0 left-0 h-full w-14 bg-no-repeat bg-contain z-0 rounded-l-2xl"
-        style={{
-          backgroundImage: `url(/assets/VectorVertical.svg)`,
-          backgroundPosition: "center left",
-          backgroundSize: "cover",
-        }}
-      />
+        whileHover="hover"
+        className="relative overflow-hidden rounded-2xl shadow-lg flex flex-col md:flex-row w-full max-w-[660px] mx-auto group bg-white cursor-pointer h-[280px]"
+      >
+        {/* Image */}
+        <div className="w-full md:w-1/2 h-32 md:h-full">
+          <Image
+            src={image}
+            alt={title}
+            width={330}
+            height={280}
+            className="w-full h-full object-cover"
+          />
+        </div>
 
-      {/* Image */}
-      <div className="w-full md:w-1/2 h-40 md:h-full">
-        <Image
-          src={image}
-          alt={title}
-          width={300}
-          height={160}
-          className="w-full h-full object-cover rounded-none md:rounded-r-2xl"
-        />
-      </div>
+        {/* Text Content */}
+        <div className="w-full md:w-1/2 h-full flex flex-col p-6 bg-white relative z-10">
+          <div className="flex-1 flex flex-col">
+            <h2 className="text-xl font-bold mb-3 text-gray-900">{title}</h2>
+            <p className="text-sm text-gray-600 mb-4">{text}</p>
 
-      {/* Text Content */}
-      <div className="w-full md:w-1/2 h-full flex flex-col p-4 bg-[#efeded] relative z-10 rounded-l-2xl md:rounded-none">
-        <div className="flex-1 flex flex-col">
-          <h2 className="text-lg font-semibold mb-2">{title}</h2>
-          <p className="text-sm text-gray-600 mb-4">{text}</p>
-
-          {/* Icon Row */}
-          <div className="flex gap-3 mb-4">
-            {icons.map((iconName, index) => {
-              const IconComponent = iconMap[iconName];
-              return IconComponent ? (
-                <div
-                  key={index}
-                  className="p-2 bg-[#1f1f1f]/70 text-white rounded-full"
-                >
-                  <IconComponent size={16} />
-                </div>
-              ) : null;
-            })}
+            {/* Icon Row */}
+            <div className="flex gap-2 mb-6">
+              {icons.map((iconName, index) => {
+                const IconComponent = iconMap[iconName];
+                return IconComponent ? (
+                  <div
+                    key={index}
+                    className="p-2 bg-gray-900 text-white rounded-full"
+                  >
+                    <IconComponent size={14} />
+                  </div>
+                ) : null;
+              })}
+            </div>
           </div>
 
-          {/* PDF Downloads */}
-          {pdfs && pdfs.length > 0 && (
-            <div className="space-y-2 mb-2">
-              {pdfs.map((pdf, index) => (
-                <a
-                  key={index}
-                  href={pdf.file}
-                  download
-                  className="block text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline"
-                >
-                  📄 {pdf.name}
-                </a>
-              ))}
-            </div>
-          )}
+          <button
+            className="bg-gray-900 text-white px-6 py-3 rounded-full text-sm font-semibold w-fit hover:bg-gray-800 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            Learn More
+          </button>
         </div>
-        <button className="bg-[#28231d] text-gray-100 px-4 py-2 rounded-full text-sm w-fit font-bold mt-2">
-          Learn More
-        </button>
-      </div>
-    </motion.div>
+      </motion.div>
+    </Link>
   );
 };
 
-const CardGrid: React.FC = () => {
-  const [products, setProducts] = useState<any[]>([]);
+interface CardGridProps {
+  limit?: number;
+}
+
+const CardGrid: React.FC<CardGridProps> = ({ limit }) => {
+  const [products, setProducts] = useState<
+    Array<{
+      id: string;
+      title: string;
+      text: string;
+      image: string;
+      icons: string[];
+      details: string;
+      pdfs: Array<{
+        name: string;
+        file: string;
+        downloadUrl?: string;
+      }>;
+    }>
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -147,11 +136,12 @@ const CardGrid: React.FC = () => {
         const response = await fetch("/api/products");
         if (response.ok) {
           const data = await response.json();
+          console.log("Fetched products data:", data);
           setProducts(data);
         } else {
           setError("Failed to fetch products from database");
         }
-      } catch (err) {
+      } catch {
         setError("Failed to fetch products from database");
       } finally {
         setLoading(false);
@@ -163,11 +153,11 @@ const CardGrid: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="w-full max-w-[660px] h-[205px] mx-auto bg-gray-200 rounded-2xl animate-pulse"
+            className="w-full h-[280px] mx-auto bg-gray-200 rounded-2xl animate-pulse"
           />
         ))}
       </div>
@@ -197,18 +187,30 @@ const CardGrid: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {products.map((item, index) => (
-        <Card
-          key={index}
-          title={item.title}
-          text={item.text}
-          image={imageMap[item.image] || item.image}
-          icons={item.icons}
-          details={item.details}
-          pdfs={item.pdfs}
-        />
-      ))}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+      {(limit ? products.slice(0, limit) : products).map((item, index) => {
+        console.log(`Product ${index}:`, item);
+        console.log(`Product ${index} ID:`, item.id);
+        return (
+          <Card
+            key={index}
+            title={item.title}
+            text={item.text}
+            image={
+              imageMap[item.image] ||
+              (item.image &&
+              !item.image.startsWith("http") &&
+              !item.image.startsWith("/")
+                ? `/assets/${item.image}`
+                : item.image)
+            }
+            icons={item.icons}
+            details={item.details}
+            pdfs={item.pdfs}
+            id={item.id}
+          />
+        );
+      })}
     </div>
   );
 };

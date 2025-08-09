@@ -47,10 +47,14 @@ const AboutHeroSection: React.FC<AboutHeroSectionProps> = ({
           </p>
         </div>
         <div className="mt-6">
-          <button className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-black text-white hover:bg-blue-600 font-medium transition-all hover:shadow-lg">
+          <a
+            href="/pdfs/brochure.pdf"
+            download
+            className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-black text-white hover:bg-blue-600 font-medium transition-all hover:shadow-lg"
+          >
             Download Brochure
             <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-          </button>
+          </a>
         </div>
       </div>
     </div>

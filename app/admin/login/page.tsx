@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
         const data = await res.json();
         setError(data.error || "Login failed");
       }
-    } catch (err) {
+    } catch {
       setError("Network error");
     } finally {
       setLoading(false);

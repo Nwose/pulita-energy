@@ -4,7 +4,7 @@ import { api } from "../../../convex/_generated/api";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const blogs = await convex.query(api.blogs.getBlogs);
 

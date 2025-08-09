@@ -4,14 +4,14 @@ import { api } from "../../../convex/_generated/api";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const projects = await convex.query(api.projects.getProjects);
 
     const transformedProjects = projects.map((project: any) => ({
-      id: project._id,
-      name: project.name,
-      summary: project.summary,
+      _id: project._id,
+      title: project.name,
+      description: project.summary,
       date: project.date,
       images: project.images,
       details: project.details,

@@ -1,22 +1,28 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 
 export const getProducts = query({
   args: {},
   handler: async (ctx) => {
     const products = await ctx.db
       .query("products")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+      // .withIndex("by_active", (q) => q.eq("isActive", true))
       .order("asc")
       .collect();
 
+    console.log("Products from Convex query:", products);
+
     return products.map((product) => ({
+      _id: product._id,
+      id: product._id as string,
       title: product.title,
       text: product.text,
       image: product.image,
       icons: product.icons,
       details: product.details,
       pdfs: product.pdfs ? JSON.parse(JSON.stringify(product.pdfs)) : [],
+      isActive: product.isActive,
     }));
   },
 });
@@ -68,5 +74,16 @@ export const deleteProduct = mutation({
   },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.id);
+  },
+});
+
+export const updateAllProductsToActive = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const products = await ctx.db.query("products").collect();
+    for (const product of products) {
+      await ctx.db.patch(product._id, { isActive: true });
+    }
+    return products.length;
   },
 });

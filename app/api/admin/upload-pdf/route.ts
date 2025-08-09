@@ -24,9 +24,10 @@ export async function POST(req: NextRequest) {
     const result: any = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
-          resource_type: "raw",
+          resource_type: "image",
           format: "pdf",
           folder: "pulita-energy/pdfs",
+          public_id: `pdf_${Date.now()}`,
         },
         (error, result) => {
           if (error) return reject(error);
@@ -43,8 +44,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Generate proper URLs for PDFs
+    const viewingUrl = result.secure_url;
+    const downloadUrl = result.secure_url;
+
     return NextResponse.json({
-      url: result.secure_url,
+      url: viewingUrl,
+      downloadUrl: downloadUrl,
       public_id: result.public_id,
       filename: result.original_filename,
     });

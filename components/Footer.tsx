@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   FaMapMarkerAlt,
   FaPhoneAlt,
@@ -12,6 +13,15 @@ import {
 } from "react-icons/fa";
 
 const Footer: React.FC = () => {
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "About Us", path: "/about" },
+    { name: "Products", path: "/products" },
+    { name: "Project", path: "/projects" },
+    { name: "Contact", path: "/contact" },
+    { name: "Blog", path: "/blog" },
+  ];
+
   return (
     <footer className="bg-gray-50  font-satoshi px-0 w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
@@ -69,7 +79,7 @@ const Footer: React.FC = () => {
             </div>
           </div>
           {/* Services Column */}
-          <div>
+          {/* <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-6">
               Services
             </h3>
@@ -88,25 +98,23 @@ const Footer: React.FC = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
           {/* Navigation Column */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-6">
               Navigation
             </h3>
             <ul className="space-y-3 text-sm text-gray-600">
-              {["Home", "About Us", "Services", "Contact", "Projects"].map(
-                (nav, index) => (
-                  <li key={index}>
-                    <a
-                      href="#"
-                      className="hover:text-blue-600 transition-colors"
-                    >
-                      {nav}
-                    </a>
-                  </li>
-                )
-              )}
+              {navLinks.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.path}
+                    className="hover:text-blue-600 transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
           {/* Social Media Column */}

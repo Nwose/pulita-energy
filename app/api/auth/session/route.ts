@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
       role: string;
     };
     return NextResponse.json({ user });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
 }

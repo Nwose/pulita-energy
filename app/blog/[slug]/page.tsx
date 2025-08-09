@@ -80,7 +80,7 @@ export default async function BlogDetailPage({
         </div>
         <div className="prose max-w-none text-gray-800">
           {blog.content.split("\n").map((p: string, i: number) => (
-            <p key={i} className="mb-4">
+            <p key={`blog-content-${i}`} className="mb-4">
               {p}
             </p>
           ))}

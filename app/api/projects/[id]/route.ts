@@ -6,7 +6,7 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(req: NextRequest, context: any) {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
 
     // Get the specific project
     const project = await convex.query(api.projects.getProject, { id });
@@ -20,8 +20,8 @@ export async function GET(req: NextRequest, context: any) {
 
     const transformedProject = {
       id: project._id,
-      name: project.name,
-      summary: project.summary,
+      title: project.name,
+      description: project.summary,
       date: project.date,
       images: project.images,
       details: project.details,
@@ -29,7 +29,10 @@ export async function GET(req: NextRequest, context: any) {
       createdAt: project.createdAt,
     };
 
-    const all = allProjects.map((p: any) => ({ id: p._id, name: p.name }));
+    const all = allProjects.map((p: any) => ({
+      id: p._id,
+      title: p.name,
+    }));
     const idx = all.findIndex((p: any) => p.id === id);
     const prev = idx > 0 ? all[idx - 1] : null;
     const next = idx < all.length - 1 ? all[idx + 1] : null;

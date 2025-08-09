@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../convex/_generated/api";
+import { Id } from "../../../../convex/_generated/dataModel";
 import jwt from "jsonwebtoken";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
@@ -112,10 +113,15 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { id } = await req.json();
-    if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    const body = await req.json();
+    const { id } = body;
+    if (!id) {
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
 
-    await convex.mutation(api.products.deleteProduct, { id });
+    // Convert string ID to Convex ID
+    const convexId = id as Id<"products">;
+    await convex.mutation(api.products.deleteProduct, { id: convexId });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting product in Convex:", error);

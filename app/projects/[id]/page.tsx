@@ -2,31 +2,40 @@ import React from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import projects from "../../../data/projects.json";
 
 interface Project {
-  id: string | number;
+  _id: string;
   name: string;
-  summary?: string;
-  date?: string;
-  images?: string[];
-  details?: string;
-  challenges?: string[];
-  [key: string]: any;
+  summary: string;
+  date: string;
+  images: string[];
+  details: string;
+  challenges: string[];
+  createdAt: number;
+  updatedAt: number;
+  authorId?: string;
 }
 
-const sectionTitles: Record<string, string> = {
-  "Solutions Provided": "Solutions Provided",
-  "Project Impact": "Project Impact",
-  "After-Sales Service": "After-Sales Service",
-};
+async function getProject(id: string) {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    (process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
 
-function getProjectById(id: string): {
-  project: Project | undefined;
-  index: number;
-} {
-  const index = (projects as Project[]).findIndex((p) => String(p.id) === id);
-  return { project: (projects as Project[])[index], index };
+  try {
+    const res = await fetch(`${baseUrl}/api/projects/${id}`, {
+      cache: "no-store",
+      next: { revalidate: 0 },
+    });
+
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.project;
+  } catch (err) {
+    console.error("Fetch project error:", err);
+    return null;
+  }
 }
 
 export default async function ProjectDetailsPage({
@@ -35,40 +44,15 @@ export default async function ProjectDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { project, index: projectIndex } = getProjectById(id);
+  const projectData = await getProject(id);
 
-  if (!project) {
+  if (!projectData) {
     notFound();
   }
 
-  const prevProject =
-    projectIndex > 0 ? (projects as Project[])[projectIndex - 1] : null;
-  const nextProject =
-    projectIndex < (projects as Project[]).length - 1
-      ? (projects as Project[])[projectIndex + 1]
-      : null;
-
-  const renderSection = (key: string) => {
-    const cleanKey = Object.keys(project).find((k) => k.trim() === key);
-    const items = project[cleanKey!];
-    if (Array.isArray(items) && items.length > 0) {
-      return (
-        <div className="max-w-2xl mx-auto mb-10">
-          <h2 className="text-xl font-semibold mb-4 text-left">
-            {sectionTitles[key]}
-          </h2>
-          <ul className="list-disc list-inside space-y-3 text-gray-700 text-left">
-            {items.map((item: string, idx: number) => (
-              <li key={idx} className="leading-relaxed text-base">
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-      );
-    }
-    return null;
-  };
+  const project = projectData;
+  const prevProject = projectData.prev;
+  const nextProject = projectData.next;
 
   return (
     <div className="min-h-screen bg-white py-16 px-6 max-w-6xl mx-auto">
@@ -89,66 +73,74 @@ export default async function ProjectDetailsPage({
       {/* Images */}
       {(project.images?.length ?? 0) > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-          {(project.images ?? []).map((img: string, index: number) => (
-            <Image
-              key={index}
-              src={img.startsWith("/assets/") ? img : `/assets/${img}`}
-              alt={`Project image ${index + 1}`}
-              width={600}
-              height={320}
-              className="w-full h-80 object-cover rounded-xl"
-            />
-          ))}
+          {(project.images ?? []).map((img: string, index: number) => {
+            // Ensure image URL is properly formatted for Next.js Image component
+            let imageSrc = img;
+            if (
+              imageSrc &&
+              !imageSrc.startsWith("http") &&
+              !imageSrc.startsWith("/")
+            ) {
+              imageSrc = `/assets/${imageSrc}`;
+            }
+
+            return (
+              <Image
+                key={`project-image-${index}`}
+                src={imageSrc}
+                alt={`Project image ${index + 1}`}
+                width={600}
+                height={320}
+                className="w-full h-80 object-cover rounded-xl"
+              />
+            );
+          })}
         </div>
       )}
-      {/* Project Details Section (Name + Paragraph) */}
+
+      {/* Details */}
       {project.details && (
-        <div className="mb-10 text-center max-w-2xl mx-auto">
-          <h2 className="text-xl font-semibold mb-3">{project.name}</h2>
-          <p className="text-gray-700 leading-relaxed text-lg">
+        <div className="max-w-2xl mx-auto mb-10">
+          <h2 className="text-xl font-semibold mb-4 text-left">Details</h2>
+          <p className="text-gray-700 text-left leading-relaxed text-base">
             {project.details}
           </p>
         </div>
       )}
+
       {/* Challenges */}
-      {(project.challenges?.length ?? 0) > 0 && (
+      {project.challenges && project.challenges.length > 0 && (
         <div className="max-w-2xl mx-auto mb-10">
-          <h2 className="text-xl font-semibold mb-4 text-left">
-            Challenges Faced
-          </h2>
+          <h2 className="text-xl font-semibold mb-4 text-left">Challenges</h2>
           <ul className="list-disc list-inside space-y-3 text-gray-700 text-left">
-            {(project.challenges ?? []).map((item: string, index: number) => (
-              <li key={index} className="leading-relaxed text-base">
-                {item}
+            {project.challenges.map((challenge: string, idx: number) => (
+              <li
+                key={`project-challenge-${idx}`}
+                className="leading-relaxed text-base"
+              >
+                {challenge}
               </li>
             ))}
           </ul>
         </div>
       )}
-      {/* Other Sections */}
-      {renderSection("Solutions Provided")}
-      {renderSection("Project Impact")}
-      {renderSection("After-Sales Service")}
-      {/* Previous / Next Navigation */}
-      <div className="flex justify-between items-center mt-12 pt-6 border-t border-gray-300 text-sm md:text-base">
+
+      {/* Navigation */}
+      <div className="flex justify-between items-center pt-8 text-sm">
         {prevProject ? (
-          <Link
-            href={`/projects/${prevProject.id}`}
-            className="text-blue-700 font-semibold hover:text-blue-900 transition duration-200"
-          >
-            ← {prevProject.name}
+          <Link href={`/projects/${prevProject.id}`} className="text-blue-500">
+            ← {prevProject.title}
           </Link>
         ) : (
           <div />
         )}
         {nextProject ? (
-          <Link
-            href={`/projects/${nextProject.id}`}
-            className="text-blue-700 font-semibold hover:text-blue-900 transition duration-200 ml-auto"
-          >
-            {nextProject.name} →
+          <Link href={`/projects/${nextProject.id}`} className="text-blue-500">
+            {nextProject.title} →
           </Link>
-        ) : null}
+        ) : (
+          <div />
+        )}
       </div>
     </div>
   );

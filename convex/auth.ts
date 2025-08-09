@@ -13,10 +13,9 @@ export const login = mutation({
       throw new Error("Missing fields");
     }
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_email", (q) => q.eq("email", email))
-      .first();
+    // Try a simpler query first
+    const allUsers = await ctx.db.query("users").collect();
+    const user = allUsers.find((u) => u.email === email);
 
     if (!user) {
       throw new Error("Invalid credentials");

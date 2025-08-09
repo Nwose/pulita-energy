@@ -65,7 +65,7 @@ const ContactForm: React.FC = () => {
         "bQE5kBBTyQzSNZDPp"
       )
       .then(
-        (result) => {
+        () => {
           setSuccess(
             "Thank you for contacting us! We have received your message and will respond soon."
           );
@@ -77,7 +77,7 @@ const ContactForm: React.FC = () => {
             message: "",
           });
         },
-        (error) => {
+        () => {
           setError("Sorry, something went wrong. Please try again later.");
         }
       );

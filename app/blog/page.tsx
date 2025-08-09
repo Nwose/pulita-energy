@@ -99,9 +99,9 @@ export default function BlogPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogs.map((blog) => (
+            {blogs.map((blog, index) => (
               <Link
-                key={blog.id}
+                key={blog.id || blog.slug || index}
                 href={`/blog/${blog.slug}`}
                 className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
               >

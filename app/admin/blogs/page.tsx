@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface Blog {
-  id: string;
+  _id: string;
   title: string;
   slug: string;
   excerpt: string;
@@ -132,10 +132,14 @@ export default function AdminBlogsPage() {
       authorAvatar: blog.authorAvatar || "",
       date: blog.date || 0,
     });
-    setEditingId(blog.id);
+    setEditingId(blog._id);
   }
 
   async function handleDelete(id: string) {
+    if (!id) {
+      alert("Blog ID is missing!");
+      return;
+    }
     if (!confirm("Delete this blog post?")) return;
     setLoading(true);
     const res = await fetch("/api/admin/blogs", {
@@ -442,9 +446,9 @@ export default function AdminBlogsPage() {
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {blogs.map((blog) => (
+                  {blogs.map((blog, index) => (
                     <div
-                      key={blog.id}
+                      key={blog._id || blog.slug || index}
                       className="bg-white p-4 rounded-lg border flex flex-col md:flex-row md:items-center md:justify-between gap-4"
                     >
                       <div className="flex-1">
@@ -475,7 +479,7 @@ export default function AdminBlogsPage() {
                         </button>
                         <button
                           className="text-red-600 hover:text-red-800 px-3 py-1 border border-red-200 rounded hover:bg-red-50"
-                          onClick={() => handleDelete(blog.id)}
+                          onClick={() => handleDelete(blog._id)}
                           disabled={loading}
                         >
                           Delete

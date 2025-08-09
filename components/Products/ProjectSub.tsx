@@ -193,7 +193,7 @@ const CardGrid: React.FC<CardGridProps> = ({ limit }) => {
         console.log(`Product ${index} ID:`, item.id);
         return (
           <Card
-            key={index}
+            key={item.id || index}
             title={item.title}
             text={item.text}
             image={

@@ -124,7 +124,7 @@ const ProjectSectionCard: React.FC<ProjectSectionCardProps> = ({ limit }) => {
 
             return (
               <Link
-                key={`${project._id}-${idx}`}
+                key={project._id || idx}
                 href={`/projects/${project._id}`}
                 className="drop-vec group relative overflow-hidden rounded-3xl shadow-lg"
               >

@@ -46,6 +46,8 @@ export default async function ProjectDetailsPage({
   const { id } = await params;
   const projectData = await getProject(id);
 
+  console.log(projectData);
+
   if (!projectData) {
     notFound();
   }
@@ -55,14 +57,14 @@ export default async function ProjectDetailsPage({
   const nextProject = projectData.next;
 
   return (
-    <div className="min-h-screen bg-white py-16 px-6 max-w-6xl mx-auto">
+    <div className="min-h-screen bg-white py-10 px-6 max-w-6xl mx-auto">
       {/* Top Title */}
       <h1 className="text-3xl md:text-4xl font-bold mb-2 text-center">
-        {project.name}
+        {project.title}
       </h1>
-      {project.summary && (
+      {project.description && (
         <p className="text-gray-600 text-center max-w-3xl mx-auto mb-2">
-          {project.summary}
+          {project.description}
         </p>
       )}
       {project.date && (
@@ -72,31 +74,40 @@ export default async function ProjectDetailsPage({
       )}
       {/* Images */}
       {(project.images?.length ?? 0) > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-          {(project.images ?? []).map((img: string, index: number) => {
-            // Ensure image URL is properly formatted for Next.js Image component
-            let imageSrc = img;
-            if (
-              imageSrc &&
-              !imageSrc.startsWith("http") &&
-              !imageSrc.startsWith("/")
-            ) {
-              imageSrc = `/assets/${imageSrc}`;
-            }
+  <div
+    className={`mb-10 gap-6 ${
+      project.images.length === 1
+        ? "flex justify-center" // center single image
+        : "grid grid-cols-1 md:grid-cols-2 justify-items-center" // row/grid for multiple
+    }`}
+  >
+    {(project.images ?? []).map((img: string, index: number) => {
+      // Ensure image URL is properly formatted for Next.js Image component
+      let imageSrc = img;
+      if (
+        imageSrc &&
+        !imageSrc.startsWith("http") &&
+        !imageSrc.startsWith("/")
+      ) {
+        imageSrc = `/assets/${imageSrc}`;
+      }
 
-            return (
-              <Image
-                key={`project-image-${index}`}
-                src={imageSrc}
-                alt={`Project image ${index + 1}`}
-                width={600}
-                height={320}
-                className="w-full h-80 object-cover rounded-xl"
-              />
-            );
-          })}
-        </div>
-      )}
+      return (
+        <Image
+          key={`project-image-${index}`}
+          src={imageSrc}
+          alt={`Project image ${index + 1}`}
+          width={600}
+          height={320}
+          className={`h-80 object-cover rounded-xl ${
+            project.images.length === 1 ? "w-auto max-w-full" : "w-full"
+          }`}
+        />
+      );
+    })}
+  </div>
+)}
+
 
       {/* Details */}
       {project.details && (

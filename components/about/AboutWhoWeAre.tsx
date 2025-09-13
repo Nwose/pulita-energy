@@ -42,7 +42,7 @@ const AboutWhoWeAre: React.FC = () => {
           <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
             <div className="bg-gray-200">
               <Image
-                src="/assets/Images.png"
+                src="/assets/8.jpg"
                 alt="Fuel Service Operations"
                 width={600}
                 height={256}

@@ -6,7 +6,7 @@ const teamMembers: TeamMember[] = [
     name: "John Wang",
     role: "CEO",
     image: "/assets/john.JPG",
-    email: "marcus@pulita.com",
+    email: "john@hitepower.com",
     bio: "Passionate about creating innovative solutions that make a real impact on businesses and the environment.",
   },
   {
@@ -18,9 +18,9 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "Richard Chinemelum Arannonu",
-    role: "CTO",
+    role: "Chief Technical Engineer",
     image: "/assets/richard.JPG",
-    email: "david@pulita.com",
+    email: "richard.arannonu@gmail.com",
     bio: "Expert in renewable energy systems with a focus on innovative and scalable solutions.",
   },
 ];

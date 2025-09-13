@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const result: any = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
-          resource_type: "image",
+          resource_type: "raw",
           format: "pdf",
           folder: "pulita-energy/pdfs",
           public_id: `pdf_${Date.now()}`,

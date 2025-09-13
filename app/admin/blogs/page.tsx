@@ -26,6 +26,16 @@ function isValidImageUrl(url: string): boolean {
   }
 }
 
+// Helper function to generate slug from title
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s]/gi, '') // Remove special characters
+    .replace(/\s+/g, '-')     // Replace spaces with hyphens
+    .replace(/-+/g, '-')      // Replace multiple hyphens with single hyphen
+    .trim();                  // Trim leading/trailing hyphens
+}
+
 export default function AdminBlogsPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [form, setForm] = useState<Partial<Blog>>({
@@ -42,6 +52,7 @@ export default function AdminBlogsPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isManualSlugEdit, setIsManualSlugEdit] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -64,6 +75,14 @@ export default function AdminBlogsPage() {
   useEffect(() => {
     fetchBlogs();
   }, []);
+
+  // Auto-generate slug when title changes (if not manually editing slug)
+  useEffect(() => {
+    if (form.title && !isManualSlugEdit) {
+      const generatedSlug = generateSlug(form.title);
+      setForm(prev => ({ ...prev, slug: generatedSlug }));
+    }
+  }, [form.title, isManualSlugEdit]);
 
   async function handleImageUpload(
     file: File,
@@ -96,7 +115,13 @@ export default function AdminBlogsPage() {
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    
+    // Track if user manually edits the slug field
+    if (name === "slug") {
+      setIsManualSlugEdit(true);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -113,6 +138,7 @@ export default function AdminBlogsPage() {
     if (res.ok) {
       setForm({});
       setEditingId(null);
+      setIsManualSlugEdit(false);
       setError("");
       fetchBlogs();
     } else {
@@ -133,6 +159,7 @@ export default function AdminBlogsPage() {
       date: blog.date || 0,
     });
     setEditingId(blog._id);
+    setIsManualSlugEdit(true); // Assume slug was manually set when editing
   }
 
   async function handleDelete(id: string) {
@@ -241,6 +268,20 @@ export default function AdminBlogsPage() {
                   placeholder="blog-post-url-slug"
                   required
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  {isManualSlugEdit 
+                    ? "Custom slug (editing manually)" 
+                    : "Slug auto-generated from title"}
+                  {!isManualSlugEdit && form.title && (
+                    <button
+                      type="button"
+                      className="ml-2 text-blue-600 hover:text-blue-800"
+                      onClick={() => setIsManualSlugEdit(true)}
+                    >
+                      Edit manually
+                    </button>
+                  )}
+                </p>
               </div>
             </div>
 
@@ -416,6 +457,7 @@ export default function AdminBlogsPage() {
                   className="text-gray-500 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
                   onClick={() => {
                     setEditingId(null);
+                    setIsManualSlugEdit(false);
                     setForm({
                       title: "",
                       slug: "",

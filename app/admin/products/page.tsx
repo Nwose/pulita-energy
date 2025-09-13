@@ -3,10 +3,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  FaBolt,
-  FaLeaf,
-  FaHome,
-  FaGasPump,
   FaPlug,
   FaCog,
   FaBus,
@@ -14,10 +10,14 @@ import {
   FaFlask,
   FaTachometerAlt,
   FaLock,
+  FaTimes,
+  FaUpload,
+  FaImage,
 } from "react-icons/fa";
 
 interface Product {
-  id: string;
+  _id?: string;
+  id?: string;
   title: string;
   text: string;
   image: string;
@@ -27,69 +27,50 @@ interface Product {
   isActive: boolean;
 }
 
-interface ProductForm {
-  title: string;
-  text: string;
-  image: string;
-  icons: string[];
-  details: string;
-  pdfs: { name: string; file: string; downloadUrl?: string }[];
-  isActive: boolean;
-}
-
-const iconMap: Record<string, any> = {
-  FaBolt,
-  FaLeaf,
-  FaHome,
-  FaGasPump,
-  FaPlug,
-  FaCog,
-  FaBus,
-  FaGlobe,
-  FaFlask,
-  FaTachometerAlt,
-  FaLock,
-};
-
-const availableIcons = [
-  "FaBolt",
-  "FaLeaf",
-  "FaHome",
-  "FaGasPump",
-  "FaPlug",
-  "FaCog",
-  "FaBus",
-  "FaGlobe",
-  "FaFlask",
-  "FaTachometerAlt",
-  "FaLock",
-];
-
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [form, setForm] = useState<ProductForm>({
-    title: "",
-    text: "",
-    image: "",
+  const [form, setForm] = useState<Partial<Product>>({
     icons: [],
-    details: "",
     pdfs: [],
     isActive: true,
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [uploadingPdf, setUploadingPdf] = useState(false);
-  const [newPdfName, setNewPdfName] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
   const router = useRouter();
 
+  const availableIcons = [
+    "FaPlug",
+    "FaCog",
+    "FaBus",
+    "FaGlobe",
+    "FaFlask",
+    "FaTachometerAlt",
+    "FaLock",
+  ];
+
+  const iconMap: Record<string, any> = {
+    FaPlug,
+    FaCog,
+    FaBus,
+    FaGlobe,
+    FaFlask,
+    FaTachometerAlt,
+    FaLock,
+  };
+
   useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => setError(""), 4000);
+    if (error || success) {
+      const timer = setTimeout(() => {
+        setError("");
+        setSuccess("");
+      }, 4000);
       return () => clearTimeout(timer);
     }
-  }, [error]);
+  }, [error, success]);
 
   async function fetchProducts() {
     const res = await fetch("/api/admin/products");
@@ -106,9 +87,10 @@ export default function AdminProductsPage() {
   }, []);
 
   async function handleImageUpload(file: File) {
-    setUploading(true);
+    setImageUploading(true);
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("upload_preset", "products"); // Make sure this matches your Cloudinary preset
 
     try {
       const res = await fetch("/api/admin/upload", {
@@ -121,24 +103,22 @@ export default function AdminProductsPage() {
         setForm({ ...form, image: data.url });
         setError("");
       } else {
-        setError("Image upload failed");
+        const errorData = await res.json();
+        setError(errorData.error || "Image upload failed");
       }
-    } catch {
+    } catch (err) {
       setError("Image upload failed");
+      console.error("Upload error:", err);
     } finally {
-      setUploading(false);
+      setImageUploading(false);
     }
   }
 
   async function handlePdfUpload(file: File) {
-    if (!newPdfName.trim()) {
-      setError("Please enter a PDF name");
-      return;
-    }
-
-    setUploadingPdf(true);
+    setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("upload_preset", "products"); // Make sure this matches your Cloudinary preset
 
     try {
       const res = await fetch("/api/admin/upload-pdf", {
@@ -148,86 +128,86 @@ export default function AdminProductsPage() {
 
       if (res.ok) {
         const data = await res.json();
+        const newPdf = {
+          name: file.name.replace(/\.[^/.]+$/, ""),
+          file: data.url,
+          downloadUrl: data.url,
+        };
         setForm({
           ...form,
-          pdfs: [
-            ...form.pdfs,
-            {
-              name: newPdfName,
-              file: data.url,
-              downloadUrl: data.downloadUrl || data.url,
-            },
-          ],
+          pdfs: [...(form.pdfs || []), newPdf],
         });
-        setNewPdfName("");
         setError("");
       } else {
-        setError("PDF upload failed");
+        const errorData = await res.json();
+        setError(errorData.error || "PDF upload failed");
       }
-    } catch {
+    } catch (err) {
       setError("PDF upload failed");
+      console.error("Upload error:", err);
     } finally {
-      setUploadingPdf(false);
+      setUploading(false);
     }
   }
 
   function handleChange(
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
-    const { name, value, type } = e.target;
-    if (type === "checkbox") {
-      const checked = (e.target as HTMLInputElement).checked;
-      setForm({ ...form, [name]: checked });
-    } else {
-      setForm({ ...form, [name]: value });
-    }
+    setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleIconToggle(iconName: string) {
-    const currentIcons = form.icons;
-    if (currentIcons.includes(iconName)) {
-      setForm({
-        ...form,
-        icons: currentIcons.filter((icon) => icon !== iconName),
-      });
-    } else {
-      setForm({
-        ...form,
-        icons: [...currentIcons, iconName],
-      });
-    }
+  function handlePdfNameChange(index: number, name: string) {
+    const updatedPdfs = [...(form.pdfs || [])];
+    updatedPdfs[index] = { ...updatedPdfs[index], name };
+    setForm({ ...form, pdfs: updatedPdfs });
   }
 
   function removePdf(index: number) {
-    const updatedPdfs = form.pdfs.filter((_, i) => i !== index);
+    const updatedPdfs = [...(form.pdfs || [])];
+    updatedPdfs.splice(index, 1);
     setForm({ ...form, pdfs: updatedPdfs });
+  }
+
+  function removeImage() {
+    setForm({ ...form, image: "" });
+  }
+
+  function toggleIcon(iconName: string) {
+    const currentIcons = form.icons || [];
+    const newIcons = currentIcons.includes(iconName)
+      ? currentIcons.filter(icon => icon !== iconName)
+      : [...currentIcons, iconName];
+    setForm({ ...form, icons: newIcons });
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
+    
+    if (!form.image) {
+      setError("Please upload an image");
+      setLoading(false);
+      return;
+    }
+    
     const method = editingId ? "PUT" : "POST";
+    const body = editingId ? { id: editingId, ...form } : form;
+    
     const res = await fetch("/api/admin/products", {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editingId ? { id: editingId, ...form } : form),
+      body: JSON.stringify(body),
     });
+    
     setLoading(false);
+    
     if (res.ok) {
-      setForm({
-        title: "",
-        text: "",
-        image: "",
-        icons: [],
-        details: "",
-        pdfs: [],
-        isActive: true,
-      });
+      setForm({ icons: [], pdfs: [], isActive: true, image: "" });
       setEditingId(null);
       setError("");
+      setSuccess(editingId ? "Product updated successfully!" : "Product created successfully!");
       fetchProducts();
     } else {
       const data = await res.json();
@@ -243,17 +223,17 @@ export default function AdminProductsPage() {
       icons: product.icons || [],
       details: product.details || "",
       pdfs: product.pdfs || [],
-      isActive: product.isActive,
+      isActive: product.isActive !== undefined ? product.isActive : true,
     });
-    setEditingId(product.id);
+    setEditingId(product._id || product.id || null);
   }
 
-  async function handleDelete(id: string) {
+  async function deleteProduct(product: Product) {
     if (!confirm("Delete this product?")) return;
-
-    if (!id) {
-      console.error("No ID provided for deletion");
-      alert("Error: No product ID found");
+    
+    const productId = product._id || product.id;
+    if (!productId) {
+      setError("Error: No valid product ID found");
       return;
     }
 
@@ -261,69 +241,18 @@ export default function AdminProductsPage() {
     const res = await fetch("/api/admin/products", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ id: productId }),
     });
     setLoading(false);
+    
     if (res.ok) {
+      setSuccess("Product deleted successfully!");
       fetchProducts();
     } else {
-      console.log("Delete failed with status:", res.status);
+      const data = await res.json();
+      setError(data.error || "Failed to delete product");
     }
   }
-
-  const ProductPreview = () => {
-    return (
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold mb-4">Live Preview</h3>
-        <div className="max-w-sm mx-auto">
-          <div className="bg-gray-50 rounded-xl p-6 text-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              {form.image ? (
-                <img
-                  src={form.image}
-                  alt={form.title}
-                  className="w-12 h-12 object-cover rounded"
-                />
-              ) : (
-                <svg
-                  className="w-8 h-8 text-blue-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              )}
-            </div>
-            <h4 className="text-lg font-semibold text-gray-900 mb-2">
-              {form.title || "Product Title"}
-            </h4>
-            <p className="text-gray-600 text-sm mb-4">
-              {form.text || "Product description will appear here."}
-            </p>
-
-            {/* Icon Row */}
-            <div className="flex gap-2 mt-2">
-              {form.icons.map((iconName, index) => {
-                const IconComponent = iconMap[iconName];
-                return IconComponent ? (
-                  <div
-                    key={`product-icon-${index}`}
-                    className="p-1 bg-[#1f1f1f]/70 text-white rounded-full"
-                  >
-                    <IconComponent size={12} />
-                  </div>
-                ) : null;
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -387,216 +316,298 @@ export default function AdminProductsPage() {
             Product Management
           </h2>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Product Form */}
-            <div>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Product Title
-                  </label>
-                  <input
-                    name="title"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-lg"
-                    value={form.title}
-                    onChange={handleChange}
-                    placeholder="Enter product title..."
-                    required
+          {/* Status Messages */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg">
+              {success}
+            </div>
+          )}
+
+          {/* Live Preview */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-4">Live Preview</h3>
+            <div className="max-w-sm mx-auto">
+              <div className="bg-white p-6 rounded-2xl shadow-lg border">
+                {form.image ? (
+                  <img
+                    src={form.image}
+                    alt={form.title || "Product image"}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
                   />
-                </div>
-
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Product Text
-                  </label>
-                  <textarea
-                    name="text"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                    rows={3}
-                    value={form.text}
-                    onChange={handleChange}
-                    placeholder="Enter product description..."
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Product Image
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleImageUpload(file);
-                    }}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                  />
-                  {form.image && (
-                    <div className="mt-2">
-                      <img
-                        src={form.image}
-                        alt="Preview"
-                        className="w-32 h-20 object-cover rounded"
-                      />
-                    </div>
-                  )}
-                  {uploading && (
-                    <p className="text-sm text-gray-500 mt-1">Uploading...</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Icons
-                  </label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {availableIcons.map((iconName) => {
-                      const IconComponent = iconMap[iconName];
-                      return (
-                        <button
-                          key={iconName}
-                          type="button"
-                          onClick={() => handleIconToggle(iconName)}
-                          className={`p-3 border rounded-lg flex items-center justify-center transition-colors ${
-                            form.icons.includes(iconName)
-                              ? "bg-blue-100 border-blue-300 text-blue-700"
-                              : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
-                          }`}
-                        >
-                          {IconComponent && <IconComponent size={20} />}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700">
-                    Details
-                  </label>
-                  <textarea
-                    name="details"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                    rows={3}
-                    value={form.details}
-                    onChange={handleChange}
-                    placeholder="Enter product details..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700">
-                    PDF Files
-                  </label>
-                  <div className="space-y-3">
-                    {form.pdfs.map((pdf, index) => (
-                      <div
-                        key={`product-pdf-${index}`}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                      >
-                        <span className="text-sm font-medium">{pdf.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => removePdf(index)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="PDF name"
-                        value={newPdfName}
-                        onChange={(e) => setNewPdfName(e.target.value)}
-                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
-                      />
-                      <input
-                        type="file"
-                        accept=".pdf"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handlePdfUpload(file);
-                        }}
-                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
-                      />
-                    </div>
-                    {uploadingPdf && (
-                      <p className="text-sm text-gray-500">Uploading PDF...</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center">
-                  <label className="flex items-center">
-                    <input
-                      name="isActive"
-                      type="checkbox"
-                      className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                      checked={form.isActive}
-                      onChange={handleChange}
-                    />
-                    <span className="ml-2 text-sm text-gray-700">
-                      Active Product
-                    </span>
-                  </label>
-                </div>
-
-                {error && (
-                  <div className="text-red-600 bg-red-50 p-3 rounded-lg">
-                    {error}
+                ) : (
+                  <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
+                    <FaImage className="w-12 h-12 text-gray-400" />
                   </div>
                 )}
-
-                <div className="flex gap-4">
-                  <button
-                    type="submit"
-                    className="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition disabled:opacity-50"
-                    disabled={loading || uploading}
-                  >
-                    {loading
-                      ? editingId
-                        ? "Saving..."
-                        : "Creating..."
-                      : editingId
-                        ? "Update Product"
-                        : "Create Product"}
-                  </button>
-                  {editingId && (
-                    <button
-                      type="button"
-                      className="text-gray-500 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
-                      onClick={() => {
-                        setEditingId(null);
-                        setForm({
-                          title: "",
-                          text: "",
-                          image: "",
-                          icons: [],
-                          details: "",
-                          pdfs: [],
-                          isActive: true,
-                        });
-                      }}
-                    >
-                      Cancel Edit
-                    </button>
-                  )}
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  {form.title || "Product Title"}
+                </h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  {form.text || "Product description will appear here."}
+                </p>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {(form.icons || []).map((iconName, idx) => {
+                    const Icon = iconMap[iconName];
+                    return Icon ? (
+                      <Icon key={idx} className="w-5 h-5 text-blue-600" />
+                    ) : null;
+                  })}
                 </div>
-              </form>
-            </div>
-
-            {/* Preview */}
-            <div>
-              <ProductPreview />
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  form.isActive 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {form.isActive ? 'Active' : 'Inactive'}
+                </span>
+              </div>
             </div>
           </div>
 
+          {/* Product Form */}
+          <form onSubmit={handleSubmit} className="mb-12 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Title
+                </label>
+                <input
+                  name="title"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-200"
+                  value={form.title || ""}
+                  onChange={handleChange}
+                  placeholder="Enter product title..."
+                  required
+                />
+              </div>
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Description
+                </label>
+                <textarea
+                  name="text"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-200"
+                  value={form.text || ""}
+                  onChange={handleChange}
+                  placeholder="Product description..."
+                  rows={3}
+                  required
+                />
+              </div>
+              
+              {/* Image Upload Section */}
+              <div className="lg:col-span-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Product Image
+                </label>
+                <div className="space-y-4">
+                  {form.image ? (
+                    <div className="flex flex-col items-start gap-4">
+                      <img
+                        src={form.image}
+                        alt="Product preview"
+                        className="h-32 object-cover rounded-lg border"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="flex items-center gap-2 text-red-600 hover:text-red-800 text-sm"
+                      >
+                        <FaTimes />
+                        Remove Image
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <FaUpload className="w-8 h-8 text-gray-400 mb-2" />
+                        <p className="text-sm text-gray-500">
+                          Click to upload product image
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          PNG, JPG, WEBP up to 10MB
+                        </p>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (file.size > 10 * 1024 * 1024) {
+                              setError("Image must be less than 10MB");
+                              return;
+                            }
+                            handleImageUpload(file);
+                          }
+                        }}
+                      />
+                    </label>
+                  )}
+                  {imageUploading && (
+                    <div className="text-sm text-blue-600">Uploading image...</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="lg:col-span-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Details
+                </label>
+                <textarea
+                  name="details"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-200"
+                  value={form.details || ""}
+                  onChange={handleChange}
+                  placeholder="Additional product details..."
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            <div className="lg:col-span-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Icons
+              </label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {availableIcons.map((iconName) => {
+                  const Icon = iconMap[iconName];
+                  const isSelected = (form.icons || []).includes(iconName);
+                  return (
+                    <button
+                      key={iconName}
+                      type="button"
+                      onClick={() => toggleIcon(iconName)}
+                      className={`p-3 rounded-lg border-2 transition-colors ${
+                        isSelected
+                          ? "bg-blue-100 border-blue-300 text-blue-700"
+                          : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                      }`}
+                      title={iconName}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="text-sm text-gray-500">
+                Selected: {(form.icons || []).join(", ") || "None"}
+              </div>
+            </div>
+
+            <div className="lg:col-span-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                PDFs
+              </label>
+              <div className="space-y-2 mb-3">
+                {(form.pdfs || []).map((pdf, index) => (
+                  <div
+                    key={`pdf-${index}`}
+                    className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg"
+                  >
+                    <input
+                      type="text"
+                      value={pdf.name}
+                      onChange={(e) =>
+                        handlePdfNameChange(index, e.target.value)
+                      }
+                      className="flex-1 p-2 text-sm border border-gray-300 rounded"
+                      placeholder="PDF Name"
+                    />
+                    <a
+                      href={pdf.downloadUrl || pdf.file}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline text-sm px-2"
+                    >
+                      View
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => removePdf(index)}
+                      className="text-red-600 hover:text-red-800 p-1"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <label className="flex items-center gap-2 text-sm text-blue-600 cursor-pointer p-2 border-2 border-dashed border-blue-300 rounded-lg hover:bg-blue-50">
+                <FaUpload />
+                <span>Upload PDF</span>
+                <input
+                  type="file"
+                  accept=".pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      if (file.size > 20 * 1024 * 1024) {
+                        setError("PDF must be less than 20MB");
+                        return;
+                      }
+                      handlePdfUpload(file);
+                    }
+                  }}
+                />
+              </label>
+              {uploading && (
+                <div className="text-sm text-blue-600 mt-2">Uploading PDF...</div>
+              )}
+            </div>
+
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="isActive"
+                checked={form.isActive !== false}
+                onChange={(e) =>
+                  setForm({ ...form, isActive: e.target.checked })
+                }
+                className="h-4 w-4 text-blue-600 rounded border-gray-300"
+              />
+              <label htmlFor="isActive" className="ml-2 text-sm text-gray-700">
+                Active (visible to customers)
+              </label>
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                className="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition disabled:opacity-50"
+                disabled={loading || uploading || imageUploading}
+              >
+                {loading
+                  ? editingId
+                    ? "Updating..."
+                    : "Creating..."
+                  : editingId
+                    ? "Update Product"
+                    : "Create Product"}
+              </button>
+              {editingId && (
+                <button
+                  type="button"
+                  className="text-gray-500 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  onClick={() => {
+                    setEditingId(null);
+                    setForm({ icons: [], pdfs: [], isActive: true, image: "" });
+                  }}
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
+          </form>
+
           {/* Product List */}
-          <div className="mt-12">
+          <div>
             <h3 className="text-lg font-semibold mb-4 text-gray-900">
               All Products
             </h3>
@@ -607,38 +618,37 @@ export default function AdminProductsPage() {
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {products.map((product, index) => (
+                  {products.map((product) => (
                     <div
-                      key={product.id || `product-${index}`}
+                      key={product._id || product.id}
                       className="bg-white p-4 rounded-lg border flex flex-col md:flex-row md:items-center md:justify-between gap-4"
                     >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                      <div className="flex gap-4 flex-1">
+                        {product.image && (
+                          <img
+                            src={product.image}
+                            alt={product.title}
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        )}
+                        <div className="flex-1">
                           <h4 className="font-semibold text-gray-900">
                             {product.title}
                           </h4>
-                          <span
-                            className={`px-2 py-1 text-xs rounded-full ${
-                              product.isActive
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {product.isActive ? "Active" : "Inactive"}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {product.text}
-                        </p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-xs text-gray-500">
-                            Icons: {product.icons.length}
-                          </span>
-                          {product.pdfs && product.pdfs.length > 0 && (
-                            <span className="text-xs text-gray-500">
-                              PDFs: {product.pdfs.length}
+                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                            {product.text}
+                          </p>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                            <span>Icons: {product.icons?.length || 0}</span>
+                            <span>PDFs: {product.pdfs?.length || 0}</span>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                              product.isActive 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-gray-100 text-gray-800'
+                            }`}>
+                              {product.isActive ? 'Active' : 'Inactive'}
                             </span>
-                          )}
+                          </div>
                         </div>
                       </div>
                       <div className="flex gap-2">
@@ -651,7 +661,7 @@ export default function AdminProductsPage() {
                         </button>
                         <button
                           className="text-red-600 hover:text-red-800 px-3 py-1 border border-red-200 rounded hover:bg-red-50"
-                          onClick={() => handleDelete(product.id)}
+                          onClick={() => deleteProduct(product)}
                           disabled={loading}
                         >
                           Delete

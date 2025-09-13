@@ -5,25 +5,35 @@ import { Id } from "./_generated/dataModel";
 export const getProducts = query({
   args: {},
   handler: async (ctx) => {
-    const products = await ctx.db
-      .query("products")
-      // .withIndex("by_active", (q) => q.eq("isActive", true))
-      .order("asc")
-      .collect();
+    console.log("Query handler started");
+    
+    try {
+      const products = await ctx.db
+        .query("products")
+        .order("asc")
+        .collect();
 
-    console.log("Products from Convex query:", products);
-
-    return products.map((product) => ({
-      _id: product._id,
-      id: product._id as string,
-      title: product.title,
-      text: product.text,
-      image: product.image,
-      icons: product.icons,
-      details: product.details,
-      pdfs: product.pdfs ? JSON.parse(JSON.stringify(product.pdfs)) : [],
-      isActive: product.isActive,
-    }));
+      console.log("Number of products found:", products.length);
+      
+      // Return full product data
+      return products.map((product) => ({
+        id: product._id.toString(),
+        title: product.title,
+        text: product.text,
+        image: product.image,
+        icons: product.icons,
+        details: product.details,
+        pdfs: product.pdfs ? JSON.parse(JSON.stringify(product.pdfs)) : [],
+        isActive: product.isActive,
+        // Include any other fields you have in your products table
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+        authorId: product.authorId,
+      }));
+    } catch (error) {
+      console.error("Error in getProducts:", error);
+      throw error;
+    }
   },
 });
 

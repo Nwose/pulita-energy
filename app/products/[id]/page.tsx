@@ -113,7 +113,7 @@ export default async function ProductDetailsPage({
                 alt={product.title}
                 width={800}
                 height={400}
-                className="w-full h-64 md:h-80 object-cover rounded-xl shadow-lg"
+                className="w-full h-64 md:h-80 rounded-xl object-contain"
               />
             </div>
           </div>
@@ -126,9 +126,7 @@ export default async function ProductDetailsPage({
               Details
             </h2>
             <div className="bg-gray-50 rounded-xl p-6">
-              <p className="text-gray-700 leading-relaxed text-base whitespace-pre-line">
-                {product.details}
-              </p>
+              <p className="text-gray-700 text-base">{product.details}</p>
             </div>
           </div>
         )}

@@ -1,20 +1,23 @@
-import '../src/index.css';
-import Header from '../src/components/Header';
-import Footer from '../src/components/Footer';
+import "../src/index.css";
+import Header from "../src/components/Header";
+import Footer from "../src/components/Footer";
 
 export const metadata = {
-    title: 'Pulita Energy',
-    description: 'Pulita Energy website',
+  title: "Pulita Energy",
+  description: "Pulita Energy website",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({ children }) {
-    return (
-        <html lang="en">
-            <body>
-                <Header />
-                {children}
-                <Footer />
-            </body>
-        </html>
-    );
-} 
+  return (
+    <html lang="en">
+      <body>
+        <Header />
+        {children}
+        <Footer />
+      </body>
+    </html>
+  );
+}

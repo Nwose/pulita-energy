@@ -3,6 +3,7 @@ import { GrStatusGood } from "react-icons/gr";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import React from "react";
+import Link from "next/link";
 
 // Animation Variants
 const container = {
@@ -66,20 +67,21 @@ const HeroSection: React.FC = () => {
               sustainable power.
             </motion.p>
 
-            <motion.button
-              className="btn relative overflow-hidden group bg-black text-white px-6 py-2 rounded-full flex items-center"
-              variants={fadeInUp}
-            >
-              <p className="font-bold relative z-10 group-hover:text-white transition-colors duration-300">
-                Get a Quote
-              </p>
-              <span
-                className="btn-circle absolute right-0 top-0 h-full w-12 bg-[#2563EB] transition-all duration-300 ease-in-out group-hover:w-full z-0 rounded-full"
-                style={{ minWidth: "3rem" }}
-              >
-                <FaArrowRight size={15} className="text-white" />
-              </span>
-            </motion.button>
+            <motion.div variants={fadeInUp}>
+              <Link href="/contact">
+                <button className="btn relative overflow-hidden group bg-black text-white px-6 py-2 rounded-full flex items-center">
+                  <p className="font-bold relative z-10 group-hover:text-white transition-colors duration-300">
+                    Get a Quote
+                  </p>
+                  <span
+                    className="btn-circle absolute right-0 top-0 h-full w-12 bg-[#2563EB] transition-all duration-300 ease-in-out group-hover:w-full z-0 rounded-full"
+                    style={{ minWidth: "3rem" }}
+                  >
+                    <FaArrowRight size={15} className="text-white" />
+                  </span>
+                </button>
+              </Link>
+            </motion.div>
           </motion.div>
 
           {/* Right - Generator Visual */}

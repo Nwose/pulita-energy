@@ -54,6 +54,7 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ title, text, image, icons }) => {
+  const text_len = 100;
   return (
     <Link href={`/products/${encodeURIComponent(title)}`} className="block">
       <motion.div
@@ -75,7 +76,9 @@ const Card: React.FC<CardProps> = ({ title, text, image, icons }) => {
         <div className="w-full md:w-1/2 h-full flex flex-col p-6 bg-white relative z-10">
           <div className="flex-1 flex flex-col">
             <h2 className="text-xl font-bold mb-3 text-gray-900">{title}</h2>
-            <p className="text-sm text-gray-600 mb-4">{text}</p>
+            <p className="text-sm text-gray-600 mb-4">
+              {text.length > text_len ? `${text.slice(0, text_len)}...` : text}
+            </p>
 
             {/* Icon Row */}
             <div className="flex gap-2 mb-6">

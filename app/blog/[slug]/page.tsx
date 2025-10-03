@@ -73,7 +73,7 @@ export default async function BlogDetailPage({
             src={blog.image || "/placeholder-blog.png"}
             alt={blog.title}
             fill
-            className="object-cover w-full h-full"
+            className="object-contain w-full h-auto rounded-xl"
             sizes="(max-width: 768px) 100vw, 50vw"
             priority={true}
           />

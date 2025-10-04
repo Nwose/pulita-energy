@@ -68,12 +68,12 @@ export default async function BlogDetailPage({
             {new Date(blog.date).toLocaleDateString()}
           </span>
         </div>
-        <div className="relative w-full h-72 mb-8 rounded-xl overflow-hidden">
+        <div className="relative w-full h-[24rem] mb-8 rounded-xl overflow-hidden">
           <Image
             src={blog.image || "/placeholder-blog.png"}
             alt={blog.title}
             fill
-            className="object-contain w-full h-auto rounded-xl"
+            className="object-cover w-full h-full"
             sizes="(max-width: 768px) 100vw, 50vw"
             priority={true}
           />

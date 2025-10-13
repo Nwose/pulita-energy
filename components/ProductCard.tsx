@@ -22,7 +22,7 @@ interface CardProps {
   id: string;
   title: string;
   text: string;
-  image: string; // path relative to /public/assets
+  image: string; // Can be a single image URL or first image from images array
   icons: React.ComponentType<{ size?: number }>[];
 }
 

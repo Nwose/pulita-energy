@@ -45,9 +45,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { title, slug, excerpt, content, image, author, authorAvatar, date } =
+    const { title, slug, excerpt, content, images, author, authorAvatar, date } =
       await req.json();
-    if (!title || !slug || !excerpt || !content || !image || !date) {
+    if (!title || !slug || !excerpt || !content || !images || !date) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       slug,
       excerpt,
       content,
-      image,
+      images,
       author,
       authorAvatar: authorAvatar || "",
       date: new Date(date).getTime(),

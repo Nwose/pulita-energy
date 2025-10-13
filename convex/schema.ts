@@ -14,15 +14,15 @@ export default defineSchema({
     slug: v.string(),
     excerpt: v.string(),
     content: v.string(),
-    image: v.string(),
+    images: v.optional(v.array(v.string())),
+    image: v.optional(v.string()),
     author: v.string(),
     authorAvatar: v.string(),
-    date: v.number(),
-    createdAt: v.number(),
-    updatedAt: v.number(),
     authorId: v.optional(v.string()),
-  })
-    .index("by_slug", ["slug"])
+    date: v.float64(),
+    createdAt: v.float64(),
+    updatedAt: v.float64(),
+  }).index("by_slug", ["slug"])
     .index("by_author", ["authorId"]),
 
   projects: defineTable({
@@ -40,7 +40,8 @@ export default defineSchema({
   products: defineTable({
     title: v.string(),
     text: v.string(),
-    image: v.string(),
+    images: v.optional(v.array(v.string())), // Make optional for migration
+    image: v.optional(v.string()), // Keep old field for backward compatibility
     icons: v.array(v.string()),
     details: v.optional(v.string()),
     pdfs: v.optional(v.any()),

@@ -9,7 +9,7 @@ interface Blog {
   slug: string;
   excerpt: string;
   content: string;
-  image: string;
+  images: string[];
   author: string;
   authorAvatar: string;
   date: string;
@@ -106,9 +106,9 @@ export default function BlogPage() {
                 className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
               >
                 <div className="relative h-48 overflow-hidden bg-gray-200">
-                  {isValidImageUrl(blog.image) ? (
+                  {isValidImageUrl(blog.images?.[0]) ? (
                     <Image
-                      src={blog.image}
+                      src={blog.images?.[0]}
                       alt={blog.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"

@@ -9,7 +9,7 @@ interface Blog {
   slug: string;
   excerpt: string;
   content: string;
-  image: string;
+  images: string[];
   author: string;
   authorAvatar: string;
   date: number;
@@ -30,10 +30,10 @@ function isValidImageUrl(url: string): boolean {
 function generateSlug(title: string): string {
   return title
     .toLowerCase()
-    .replace(/[^\w\s]/gi, '') // Remove special characters
-    .replace(/\s+/g, '-')     // Replace spaces with hyphens
-    .replace(/-+/g, '-')      // Replace multiple hyphens with single hyphen
-    .trim();                  // Trim leading/trailing hyphens
+    .replace(/[^\w\s]/gi, "") // Remove special characters
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+    .trim(); // Trim leading/trailing hyphens
 }
 
 export default function AdminBlogsPage() {
@@ -43,7 +43,7 @@ export default function AdminBlogsPage() {
     slug: "",
     excerpt: "",
     content: "",
-    image: "",
+    images: [],
     author: "",
     authorAvatar: "",
     date: 0,
@@ -80,36 +80,76 @@ export default function AdminBlogsPage() {
   useEffect(() => {
     if (form.title && !isManualSlugEdit) {
       const generatedSlug = generateSlug(form.title);
-      setForm(prev => ({ ...prev, slug: generatedSlug }));
+      setForm((prev) => ({ ...prev, slug: generatedSlug }));
     }
   }, [form.title, isManualSlugEdit]);
 
   async function handleImageUpload(
-    file: File,
-    field: "image" | "authorAvatar"
+    files: FileList | null,
+    field?: "authorAvatar"
   ) {
+    if (!files) return;
+
+    // Handle single file upload for author avatar
+    if (field === "authorAvatar") {
+      const file = files[0];
+      setUploading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setForm({ ...form, [field]: data.url });
+          setError("");
+        } else {
+          setError("Image upload failed");
+        }
+      } catch {
+        setError("Image upload failed");
+      } finally {
+        setUploading(false);
+      }
+      return;
+    }
+
+    // Handle multiple file upload for blog images
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setForm({ ...form, [field]: data.url });
-        setError("");
-      } else {
+    const uploaded: string[] = [];
+    for (const file of Array.from(files)) {
+      const formData = new FormData();
+      formData.append("file", file);
+      try {
+        const res = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: formData,
+        });
+        if (res.ok) {
+          const data = await res.json();
+          uploaded.push(data.url);
+        } else {
+          setError("Image upload failed");
+        }
+      } catch {
         setError("Image upload failed");
       }
-    } catch {
-      setError("Image upload failed");
-    } finally {
-      setUploading(false);
     }
+    setForm({
+      ...form,
+      images: [...(form.images || []), ...uploaded],
+    });
+    setUploading(false);
+  }
+
+  function removeImage(idx: number) {
+    const updated = [...(form.images || [])];
+    updated.splice(idx, 1);
+    setForm({ ...form, images: updated });
   }
 
   function handleChange(
@@ -117,7 +157,7 @@ export default function AdminBlogsPage() {
   ) {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-    
+
     // Track if user manually edits the slug field
     if (name === "slug") {
       setIsManualSlugEdit(true);
@@ -153,7 +193,7 @@ export default function AdminBlogsPage() {
       slug: blog.slug || "",
       excerpt: blog.excerpt || "",
       content: blog.content || "",
-      image: blog.image || "",
+      images: blog.images || [],
       author: blog.author || "",
       authorAvatar: blog.authorAvatar || "",
       date: blog.date || 0,
@@ -269,8 +309,8 @@ export default function AdminBlogsPage() {
                   required
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  {isManualSlugEdit 
-                    ? "Custom slug (editing manually)" 
+                  {isManualSlugEdit
+                    ? "Custom slug (editing manually)"
                     : "Slug auto-generated from title"}
                   {!isManualSlugEdit && form.title && (
                     <button
@@ -317,44 +357,35 @@ export default function AdminBlogsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-700">
-                  Featured Image
+                  Blog Images
                 </label>
                 <input
                   type="file"
+                  multiple
                   accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleImageUpload(file, "image");
-                  }}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                  onChange={(e) => handleImageUpload(e.target.files)}
+                  className="mb-2"
                 />
-                {form.image && (
-                  <div className="mt-2">
-                    {isValidImageUrl(form.image) ? (
+                <div className="flex flex-wrap gap-2">
+                  {(form.images || []).map((img, idx) => (
+                    <div key={`blog-image-${idx}`} className="relative group">
                       <img
-                        src={form.image}
-                        alt="Preview"
-                        className="w-32 h-20 object-cover rounded"
+                        src={img}
+                        alt="blog"
+                        className="w-24 h-24 object-cover rounded"
                       />
-                    ) : (
-                      <div className="w-32 h-20 bg-gray-200 rounded flex items-center justify-center text-gray-400">
-                        <svg
-                          className="w-8 h-8"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                )}
+                      <button
+                        type="button"
+                        onClick={() => removeImage(idx)}
+                        className="absolute top-1 right-1 bg-white bg-opacity-80 rounded-full p-1 text-xs text-red-600 group-hover:bg-opacity-100"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
                 {uploading && (
-                  <p className="text-sm text-gray-500 mt-1">Uploading...</p>
+                  <div className="text-sm text-blue-600 mt-2">Uploading...</div>
                 )}
               </div>
               <div>
@@ -366,7 +397,11 @@ export default function AdminBlogsPage() {
                   accept="image/*"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
-                    if (file) handleImageUpload(file, "authorAvatar");
+                    if (file) {
+                      // Create a FileList-like object for single file upload
+                      const files = [file] as any;
+                      handleImageUpload(files, "authorAvatar");
+                    }
                   }}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3"
                 />
@@ -463,7 +498,7 @@ export default function AdminBlogsPage() {
                       slug: "",
                       excerpt: "",
                       content: "",
-                      image: "",
+                      images: [],
                       author: "",
                       authorAvatar: "",
                       date: 0,

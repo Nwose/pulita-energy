@@ -14,7 +14,9 @@ export async function GET() {
       slug: blog.slug,
       excerpt: blog.excerpt,
       content: blog.content,
-      image: blog.image,
+      images: (blog.images && blog.images.length > 0) 
+        ? blog.images 
+        : (blog.image ? [blog.image] : ["/placeholder-blog.png"]),
       author: blog.author,
       authorAvatar: blog.authorAvatar,
       date: blog.date,

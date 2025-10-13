@@ -9,6 +9,7 @@ export async function GET(req: NextRequest, context: any) {
     const { slug } = context.params;
 
     const blog = await convex.query(api.blogs.getBlog, { slug });
+    console.log("Raw blog from Convex:", blog);
 
     if (!blog) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
@@ -20,12 +21,16 @@ export async function GET(req: NextRequest, context: any) {
       slug: blog.slug,
       excerpt: blog.excerpt,
       content: blog.content,
-      image: blog.image,
+      images: (blog.images && blog.images.length > 0) 
+        ? blog.images 
+        : (blog.image ? [blog.image] : ["/placeholder-blog.png"]),
       author: blog.author,
       authorAvatar: blog.authorAvatar,
       date: blog.date,
       createdAt: blog.createdAt,
     };
+
+    console.log("Transformed blog:", transformedBlog);
 
     return NextResponse.json({ blog: transformedBlog });
   } catch (error) {

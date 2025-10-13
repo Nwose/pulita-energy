@@ -80,7 +80,8 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    
+    console.log("Received product data:", JSON.stringify(body, null, 2));
+
     // Validate PDF URLs
     const validation = validatePdfUrls(body);
     if (!validation.isValid) {
@@ -89,7 +90,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     // Auto-convert any image URLs to raw URLs (optional - you might want to remove this)
     const processedData = {
       ...body,
@@ -99,8 +100,12 @@ export async function POST(req: NextRequest) {
         file: convertToRawUrl(pdf.file)
       })) : body.pdfs
     };
-    
+
+    console.log("Processed product data:", JSON.stringify(processedData, null, 2));
+
     const productId = await convex.mutation(api.products.createProduct, processedData);
+
+    console.log("Product created with ID:", productId);
     
     return NextResponse.json({ 
       success: true, 

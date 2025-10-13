@@ -20,7 +20,7 @@ interface Product {
   id?: string;
   title: string;
   text: string;
-  image: string;
+  images: string[];
   icons: string[];
   details?: string;
   pdfs?: { name: string; file: string; downloadUrl?: string }[];
@@ -32,6 +32,7 @@ export default function AdminProductsPage() {
   const [form, setForm] = useState<Partial<Product>>({
     icons: [],
     pdfs: [],
+    images: [],
     isActive: true,
   });
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -90,9 +91,11 @@ export default function AdminProductsPage() {
     setImageUploading(true);
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "products"); // Make sure this matches your Cloudinary preset
+    formData.append("upload_preset", "products");
 
     try {
+      console.log("Uploading file:", file.name, "Size:", file.size);
+
       const res = await fetch("/api/admin/upload", {
         method: "POST",
         body: formData,
@@ -100,15 +103,25 @@ export default function AdminProductsPage() {
 
       if (res.ok) {
         const data = await res.json();
-        setForm({ ...form, image: data.url });
+        console.log("Upload successful, received URL:", data.url);
+
+        // Use functional update to ensure we don't lose previous images
+        setForm(prevForm => {
+          const currentImages = prevForm.images || [];
+          const newImages = [...currentImages, data.url];
+          console.log("Updated images array:", newImages);
+          return { ...prevForm, images: newImages };
+        });
+
         setError("");
       } else {
         const errorData = await res.json();
+        console.error("Upload failed:", errorData);
         setError(errorData.error || "Image upload failed");
       }
     } catch (err) {
-      setError("Image upload failed");
       console.error("Upload error:", err);
+      setError("Image upload failed");
     } finally {
       setImageUploading(false);
     }
@@ -169,7 +182,13 @@ export default function AdminProductsPage() {
   }
 
   function removeImage() {
-    setForm({ ...form, image: "" });
+    setForm({ ...form, images: [] });
+  }
+
+  function removeImageByIndex(idx: number) {
+    const updated = [...(form.images || [])];
+    updated.splice(idx, 1);
+    setForm({ ...form, images: updated });
   }
 
   function toggleIcon(iconName: string) {
@@ -185,32 +204,35 @@ export default function AdminProductsPage() {
     setLoading(true);
     setError("");
     setSuccess("");
-    
-    if (!form.image) {
-      setError("Please upload an image");
+
+    if (!form.images || form.images.length === 0) {
+      setError("Please upload at least one image");
       setLoading(false);
       return;
     }
-    
+
     const method = editingId ? "PUT" : "POST";
     const body = editingId ? { id: editingId, ...form } : form;
-    
+
+    console.log("Submitting product data:", JSON.stringify(body, null, 2));
+
     const res = await fetch("/api/admin/products", {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    
+
     setLoading(false);
-    
+
     if (res.ok) {
-      setForm({ icons: [], pdfs: [], isActive: true, image: "" });
+      setForm({ icons: [], pdfs: [], images: [], isActive: true });
       setEditingId(null);
       setError("");
       setSuccess(editingId ? "Product updated successfully!" : "Product created successfully!");
       fetchProducts();
     } else {
       const data = await res.json();
+      console.error("API Error response:", data);
       setError(data.error || "Failed to save product");
     }
   }
@@ -219,7 +241,7 @@ export default function AdminProductsPage() {
     setForm({
       title: product.title || "",
       text: product.text || "",
-      image: product.image || "",
+      images: product.images || [],
       icons: product.icons || [],
       details: product.details || "",
       pdfs: product.pdfs || [],
@@ -333,9 +355,9 @@ export default function AdminProductsPage() {
             <h3 className="text-lg font-semibold mb-4">Live Preview</h3>
             <div className="max-w-sm mx-auto">
               <div className="bg-white p-6 rounded-2xl shadow-lg border">
-                {form.image ? (
+                {form.images && form.images.length > 0 ? (
                   <img
-                    src={form.image}
+                    src={form.images[0]}
                     alt={form.title || "Product image"}
                     className="w-full h-48 object-cover rounded-lg mb-4"
                   />
@@ -403,53 +425,56 @@ export default function AdminProductsPage() {
               {/* Image Upload Section */}
               <div className="lg:col-span-2">
                 <label className="block mb-2 text-sm font-medium text-gray-700">
-                  Product Image
+                  Product Images
                 </label>
                 <div className="space-y-4">
-                  {form.image ? (
-                    <div className="flex flex-col items-start gap-4">
-                      <img
-                        src={form.image}
-                        alt="Product preview"
-                        className="h-32 object-cover rounded-lg border"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeImage}
-                        className="flex items-center gap-2 text-red-600 hover:text-red-800 text-sm"
-                      >
-                        <FaTimes />
-                        Remove Image
-                      </button>
-                    </div>
-                  ) : (
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <FaUpload className="w-8 h-8 text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-500">
-                          Click to upload product image
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          PNG, JPG, WEBP up to 10MB
-                        </p>
+                  <div className="flex flex-wrap gap-2">
+                    {(form.images || []).map((img, idx) => (
+                      <div key={`product-image-${idx}`} className="relative group">
+                        <img
+                          src={img}
+                          alt="product"
+                          className="w-24 h-24 object-cover rounded"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImageByIndex(idx)}
+                          className="absolute top-1 right-1 bg-white bg-opacity-80 rounded-full p-1 text-xs text-red-600 group-hover:bg-opacity-100"
+                        >
+                          ✕
+                        </button>
                       </div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
+                    ))}
+                  </div>
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <FaUpload className="w-8 h-8 text-gray-400 mb-2" />
+                      <p className="text-sm text-gray-500">
+                        Click to upload product images
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        PNG, JPG, WEBP up to 10MB each
+                      </p>
+                    </div>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        if (files) {
+                          for (const file of Array.from(files)) {
                             if (file.size > 10 * 1024 * 1024) {
                               setError("Image must be less than 10MB");
                               return;
                             }
                             handleImageUpload(file);
                           }
-                        }}
-                      />
-                    </label>
-                  )}
+                        }
+                      }}
+                    />
+                  </label>
                   {imageUploading && (
                     <div className="text-sm text-blue-600">Uploading image...</div>
                   )}
@@ -597,7 +622,7 @@ export default function AdminProductsPage() {
                   className="text-gray-500 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
                   onClick={() => {
                     setEditingId(null);
-                    setForm({ icons: [], pdfs: [], isActive: true, image: "" });
+                    setForm({ icons: [], pdfs: [], images: [], isActive: true });
                   }}
                 >
                   Cancel Edit
@@ -624,9 +649,9 @@ export default function AdminProductsPage() {
                       className="bg-white p-4 rounded-lg border flex flex-col md:flex-row md:items-center md:justify-between gap-4"
                     >
                       <div className="flex gap-4 flex-1">
-                        {product.image && (
+                        {product.images && product.images.length > 0 && (
                           <img
-                            src={product.image}
+                            src={product.images[0]}
                             alt={product.title}
                             className="w-16 h-16 object-cover rounded"
                           />
@@ -640,6 +665,7 @@ export default function AdminProductsPage() {
                           </p>
                           <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                             <span>Icons: {product.icons?.length || 0}</span>
+                            <span>Images: {product.images?.length || 0}</span>
                             <span>PDFs: {product.pdfs?.length || 0}</span>
                             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                               product.isActive 

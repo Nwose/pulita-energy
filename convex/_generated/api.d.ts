@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as auth from "../auth.js";
 import type * as blogs from "../blogs.js";
+import type * as migrations from "../migrations.js";
 import type * as products from "../products.js";
 import type * as projects from "../projects.js";
 
@@ -29,6 +30,7 @@ import type * as projects from "../projects.js";
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   blogs: typeof blogs;
+  migrations: typeof migrations;
   products: typeof products;
   projects: typeof projects;
 }>;

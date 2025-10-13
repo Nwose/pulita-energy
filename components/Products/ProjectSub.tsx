@@ -120,7 +120,7 @@ const CardGrid: React.FC<CardGridProps> = ({ limit }) => {
       id: string;
       title: string;
       text: string;
-      image: string;
+      images: string[];
       icons: string[];
       details: string;
       pdfs: Array<{
@@ -200,12 +200,9 @@ const CardGrid: React.FC<CardGridProps> = ({ limit }) => {
             title={item.title}
             text={item.text}
             image={
-              imageMap[item.image] ||
-              (item.image &&
-              !item.image.startsWith("http") &&
-              !item.image.startsWith("/")
-                ? `/assets/${item.image}`
-                : item.image)
+              item.images && item.images.length > 0
+                ? item.images[0] // Use first image from the array
+                : "/placeholder-product.png" // Fallback for missing images
             }
             icons={item.icons}
             details={item.details}

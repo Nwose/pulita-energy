@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import PdfCards from "./PdfCards";
 
 interface Product {
   _id: string;
@@ -33,11 +33,14 @@ async function getProduct(id: string): Promise<Product | null> {
   try {
     if (isConvexId) {
       // Try to fetch by ID first (for URLs with database IDs)
-      const res = await fetch(`${baseUrl}/api/products/${encodeURIComponent(id)}`, {
-        cache: "no-store",
-        next: { revalidate: 0 },
-        signal: AbortSignal.timeout(10000), // 10 second timeout
-      });
+      const res = await fetch(
+        `${baseUrl}/api/products/${encodeURIComponent(id)}`,
+        {
+          cache: "no-store",
+          next: { revalidate: 0 },
+          signal: AbortSignal.timeout(10000), // 10 second timeout
+        }
+      );
 
       if (res.ok) {
         const product = await res.json();
@@ -58,7 +61,10 @@ async function getProduct(id: string): Promise<Product | null> {
     if (!allRes.ok) return null;
     const data = await allRes.json();
     console.log("getProduct - API response:", data);
-    console.log("getProduct - Looking for product with title:", decodeURIComponent(id));
+    console.log(
+      "getProduct - Looking for product with title:",
+      decodeURIComponent(id)
+    );
     const product = data.find((p: any) => p.title === decodeURIComponent(id));
     console.log("getProduct - Found product by title:", product);
     return product;
@@ -92,13 +98,12 @@ async function getAllProducts(): Promise<Product[]> {
 }
 
 export default function ProductDetailsPage() {
-  const router = useRouter();
   const [id, setId] = useState<string>("");
 
   useEffect(() => {
     // Extract ID from pathname
     const pathname = window.location.pathname;
-    const pathSegments = pathname.split('/');
+    const pathSegments = pathname.split("/");
     const productId = pathSegments[pathSegments.length - 1];
     setId(decodeURIComponent(productId));
   }, []);
@@ -155,7 +160,10 @@ export default function ProductDetailsPage() {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
             <p className="text-gray-600 mb-4">{error}</p>
-            <Link href="/products" className="text-blue-600 hover:text-blue-800">
+            <Link
+              href="/products"
+              className="text-blue-600 hover:text-blue-800"
+            >
               Back to Products
             </Link>
           </div>
@@ -169,8 +177,13 @@ export default function ProductDetailsPage() {
       <div className="min-h-screen bg-gray-50 py-12 px-4">
         <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-600 mb-4">Product Not Found</h1>
-            <Link href="/products" className="text-blue-600 hover:text-blue-800">
+            <h1 className="text-2xl font-bold text-gray-600 mb-4">
+              Product Not Found
+            </h1>
+            <Link
+              href="/products"
+              className="text-blue-600 hover:text-blue-800"
+            >
               Back to Products
             </Link>
           </div>
@@ -188,9 +201,10 @@ export default function ProductDetailsPage() {
     index < allProducts.length - 1 ? allProducts[index + 1] : null;
 
   // Ensure image URL is properly formatted for Next.js Image component
-  let imageSrc = product?.images && product.images.length > 0
-    ? product.images[0]
-    : "/placeholder-product.png";
+  let imageSrc =
+    product?.images && product.images.length > 0
+      ? product.images[0]
+      : "/placeholder-product.png";
   if (imageSrc && !imageSrc.startsWith("http") && !imageSrc.startsWith("/")) {
     imageSrc = `/assets/${imageSrc}`;
   }
@@ -227,12 +241,19 @@ export default function ProductDetailsPage() {
                 {product.images.map((image: string, index: number) => {
                   // Ensure image URL is properly formatted for Next.js Image component
                   let processedImageSrc = image;
-                  if (processedImageSrc && !processedImageSrc.startsWith("http") && !processedImageSrc.startsWith("/")) {
+                  if (
+                    processedImageSrc &&
+                    !processedImageSrc.startsWith("http") &&
+                    !processedImageSrc.startsWith("/")
+                  ) {
                     processedImageSrc = `/assets/${processedImageSrc}`;
                   }
 
                   return (
-                    <div key={index} className="relative aspect-video rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div
+                      key={index}
+                      className="relative aspect-video rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+                    >
                       <Image
                         src={processedImageSrc}
                         alt={`${product.title} - Image ${index + 1}`}
@@ -251,8 +272,16 @@ export default function ProductDetailsPage() {
           <div className="mb-8">
             <div className="relative w-full h-[24rem] rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center">
               <div className="text-center text-gray-400">
-                <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                <svg
+                  className="w-16 h-16 mx-auto mb-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <p>No images available</p>
               </div>
@@ -278,35 +307,7 @@ export default function ProductDetailsPage() {
             <h2 className="text-2xl font-semibold mb-8 text-center text-gray-900">
               Documentation
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {product.pdfs.map((pdf, index) => (
-                <div
-                  key={index}
-                  className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group hover:border-blue-300"
-                >
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                      <svg
-                        className="w-8 h-8 text-red-600"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 text-center leading-tight">
-                    <span className="block max-w-full break-words" title={pdf.name}>
-                      {pdf.name}
-                    </span>
-                  </h3>
-                </div>
-              ))}
-            </div>
+            <PdfCards pdfs={product.pdfs} />
           </div>
         )}
 

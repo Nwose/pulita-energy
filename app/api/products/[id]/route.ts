@@ -4,8 +4,10 @@ import { api } from "../../../../convex/_generated/api";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+
   try {
     // Check if Convex URL is available
     if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
@@ -21,7 +23,7 @@ export async function GET(
 
     // Fetch single product from Convex with timeout
     const product = (await Promise.race([
-      convex.query(api.products.getProduct, { id: params.id as any }),
+      convex.query(api.products.getProduct, { id: id as any }),
       new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error("Convex query timeout")), 8000)
       ),
